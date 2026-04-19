@@ -76,10 +76,6 @@ const RoomDetail = () => {
     }
   };
 
-  const viewHome = () => {
-    navigate("/");
-  };
-
   const goToRoomsTable = () => {
     navigate("/admin/rooms");
   };

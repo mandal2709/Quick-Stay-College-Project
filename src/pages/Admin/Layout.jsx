@@ -15,11 +15,11 @@ const AdminLayout = () => {
   }, [navigate]);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex min-h-screen flex-col bg-slate-50">
       <Navbar />
-      <div className="flex h-full">
+      <div className="flex flex-1 flex-col lg:flex-row">
         <Sidebar />
-        <div className="flex-1 p-4 pt-10 md:px-10 h-full overflow-y-auto hide-scrollbar">
+        <div className="hide-scrollbar flex-1 overflow-y-auto p-4 pt-6 md:px-8 lg:px-10 lg:pt-10">
           <Outlet />
         </div>
       </div>

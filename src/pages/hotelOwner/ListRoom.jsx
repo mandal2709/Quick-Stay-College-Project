@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { roomsDummyData, assets } from "../../assets/assets";
+import { assets } from "../../assets/assets";
 import Title from "../../components/Title";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../../config/api";
@@ -70,9 +70,9 @@ const ListRoom = () => {
         </div>
       )}
 
-      <div className="w-full text-left border border-gray-300 rounded-lg overflow-x-auto mt-4"></div>
-      <table className="w-full">
-        <thead className="bg-gray-50 sticky top-0">
+      <div className="mt-4 w-full overflow-x-auto rounded-lg border border-gray-300 text-left">
+      <table className="w-full min-w-[700px]">
+        <thead className="sticky top-0 bg-gray-50">
           <tr>
             <th className="py-3 px-4 text-gray-800 font-medium text-left">
               Title
@@ -157,6 +157,7 @@ const ListRoom = () => {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

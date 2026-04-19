@@ -7,7 +7,6 @@ import RoomDetailes from "./pages/RoomDetailes";
 import Booking from "./pages/Booking";
 import Footer from "./components/Footer";
 import MyBooking from "./pages/MyBooking";
-import HotelReg from "./components/HotelReg";
 import Layout from "./pages/hotelOwner/Layout";
 import Dashboard from "./pages/hotelOwner/Dashboard";
 import AddRoom from "./pages/hotelOwner/AddRoom";
@@ -31,7 +30,6 @@ const App = () => {
   return (
     <div className="flex-1 flex flex-col min-h-screen">
       {!isOwnerPath && !isAdminPath && <Navbar />}
-      {false && <HotelReg />}
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />

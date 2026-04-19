@@ -1,6 +1,6 @@
 import React from "react";
 import Title from "../../components/Title";
-import { assets, dashboardDummyData } from "../../assets/assets";
+import { assets } from "../../assets/assets";
 import { useState } from "react";
 import { useEffect } from "react";
 import API_BASE_URL from "../../config/api";
@@ -42,7 +42,7 @@ const Dashboard = () => {
       and analyze revenue-all in one place. Stay updated with real-time insights to ensure smooth operations"
       />
 
-      <div className="flex gap-4 my-8">
+      <div className="my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Total Booking */}
         <div className="bg-primary/3 border border-primary/10 rounded flex p-4 pr-8">
           <img
@@ -81,7 +81,7 @@ const Dashboard = () => {
         Recent Booking
       </h2>
 
-      <div className="w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll">
+      <div className="max-h-80 w-full max-w-3xl overflow-x-auto overflow-y-scroll rounded-lg border border-gray-300 text-left">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>

@@ -1,8 +1,6 @@
 import React from "react";
 import HotelCard from "./HotelCard";
-import { roomsDummyData } from "../assets/assets";
 import Title from "./Title";
-import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -29,14 +27,14 @@ const FeatureDestination = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center px-6 md:px-16 lg:px-24 bg-slate-50 py-20">
+    <div className="flex flex-col items-center bg-slate-50 px-4 py-16 sm:px-6 md:px-12 lg:px-20">
       <Title
         title="Featured Destination "
         subTitle="Discover our handpicked selection of exception 
       properties around the world, offering unparalleled luxury and unforgettable experiences."
       />
 
-      <div className="flex flex-wrap item-center justify-center gap-6 mt-20">
+      <div className="mt-12 flex w-full flex-wrap items-center justify-center gap-6">
         {rooms.slice(0, 4).map((room, index) => (
           <HotelCard key={room._id} room={room} index={index} />
         ))}
@@ -47,8 +45,7 @@ const FeatureDestination = () => {
           navigate("/rooms");
           scrollTo(0, 0);
         }}
-        className="my-16 px-4 py-2 text-sm font-medium border border-gray-300
-      rounded bg-white hover:bg-gray-50 transition-all cursor-pointer"
+        className="my-12 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium transition-all hover:bg-gray-50"
       >
         View All Destination
       </button>

@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import heroImage2 from "../assets/heroImage2.jpg";
-import { useState } from "react";
 import API_BASE_URL from "../config/api";
 
 const Hero = () => {
@@ -35,16 +34,13 @@ const Hero = () => {
     };
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/availability/check-availability`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(checkAvailabilityData),
+      await fetch(`${API_BASE_URL}/api/availability/check-availability`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(checkAvailabilityData),
+      });
     } catch (error) {
       console.error("Error checking availability:", error);
       alert("An error occurred while checking availability. Please try again.");
@@ -53,95 +49,83 @@ const Hero = () => {
 
   return (
     <div
-      className="flex flex-col items-start justify-center px-6
-     md:px-16 lg:px-24 xl:px-32 text-white
-      bg-no-repeat bg-cover bg-center h-screen"
+      className="flex min-h-screen flex-col items-start justify-center bg-cover bg-center bg-no-repeat px-4 pb-12 pt-28 text-white sm:px-6 md:px-12 lg:px-20 xl:px-32"
       style={{ backgroundImage: `url(${heroImage2})` }}
     >
-      <p className="bg-[#49B9FF]/50 px-3.5 py-1 rounded-full mt-20 text-black">
-        {" "}
-        The ultimate Hotel Experience{" "}
-      </p>
+      <div className="max-w-3xl rounded-3xl bg-white/65 p-5 shadow-xl backdrop-blur-sm sm:p-8">
+        <p className="inline-flex rounded-full bg-[#49B9FF]/60 px-3.5 py-1 text-sm text-black">
+          The ultimate hotel experience
+        </p>
 
-      <h1
-        className="font -playfair text-2x1 md:text-5x1 md:text-[56px]md:leadind-
-        [56px]font-bold md:font-extrabold max -w-x1 mt-4 text-black"
-      >
-        Discover Your Perfect Gateway Destination
-      </h1>
+        <h1 className="mt-4 max-w-2xl font-playfair text-4xl font-bold leading-tight text-black sm:text-5xl md:text-6xl">
+          Discover your perfect getaway destination
+        </h1>
 
-      <p className="max -w-130 mt-2 text-sm md :text-base text-black">
-        {" "}
-        Luxury and Comfort a wait at the world's most exclusive Hotel and
-        resort.Start your journy today.{" "}
-      </p>
+        <p className="mt-3 max-w-2xl text-sm text-black/80 sm:text-base">
+          Luxury and comfort await at world-class hotels and resorts. Find the
+          stay that fits your trip, dates, and budget in a few taps.
+        </p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white text-gray-500 rounded-lg px-6 py-4 mt-8 flex flex-col md:flex-row
-                  max-md:items-start gap-4 max-md:mx-auto"
-      >
-        <div>
-          <div className="flex items-center gap-2 text-black">
-            <img src={assets.calenderIcon} alt="" className="h-4" />
-            <label htmlFor="location">Destination</label>
-          </div>
-          <div>{formData.location}</div>
-          <input
-            id="location"
-            name="location"
-            type="text"
-            onChange={handleInputChange}
-            className=" rounded border border-black-200 px-3 py-1.5 mt-1.5 text-sm outline-none "
-            placeholder="Location"
-            required
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center gap-2 text-black">
-            <img src={assets.calenderIcon} alt="" className="h-4 " />
-            <label htmlFor="checkIn">Check in</label>
-          </div>
-          <div>{formData.checkIn}</div>
-          <input
-            id="checkIn"
-            name="checkIn"
-            onChange={handleInputChange}
-            type="date"
-            className=" rounded border 
-                border-black-200 px-3 py-1.5 mt-1.5 text-sm outline-none"
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center gap-2 text-black">
-            <img src={assets.calenderIcon} alt="" className="h-4" />
-            <label htmlFor="checkOut">Check out</label>
-          </div>
-          <div>{formData.checkOut}</div>
-          <input
-            id="checkOut"
-            name="checkOut"
-            onChange={handleInputChange}
-            type="date"
-            className=" rounded border border-black-200 px-3 py-1.5 mt-1.5 text-sm outline-none"
-          />
-        </div>
-
-        {/* <div className='flex md:flex-col max-md:gap-2 max-md:items-center text-black'>
-                    <label htmlFor="guests">Guests</label>
-                    <input min={1} max={4} id="guests" type="number" className=" rounded border border-black-200 px-3 py-1.5 mt-1.5 text-sm outline-none  max-w-16" placeholder="0" />
-                </div> */}
-
-        <button
-          type="submit"
-          className="flex items-center justify-center gap-1 rounded-md bg-black py-3 px-4 text-white my-auto cursor-pointer max-md:w-full max-md:py-1"
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-4 rounded-2xl bg-white p-4 text-gray-500 shadow-lg sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_auto] lg:items-end"
         >
-          <img src={assets.searchIcon} alt="searchicon" className="h-7" />
-          <span>Search</span>
-        </button>
-      </form>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-black">
+              <img src={assets.calenderIcon} alt="" className="h-4" />
+              <label htmlFor="location">Destination</label>
+            </div>
+            <input
+              id="location"
+              name="location"
+              type="text"
+              onChange={handleInputChange}
+              value={formData.location}
+              className="mt-1.5 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-500"
+              placeholder="Location"
+              required
+            />
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-black">
+              <img src={assets.calenderIcon} alt="" className="h-4" />
+              <label htmlFor="checkIn">Check in</label>
+            </div>
+            <input
+              id="checkIn"
+              name="checkIn"
+              onChange={handleInputChange}
+              value={formData.checkIn}
+              type="date"
+              className="mt-1.5 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-black">
+              <img src={assets.calenderIcon} alt="" className="h-4" />
+              <label htmlFor="checkOut">Check out</label>
+            </div>
+            <input
+              id="checkOut"
+              name="checkOut"
+              onChange={handleInputChange}
+              value={formData.checkOut}
+              type="date"
+              className="mt-1.5 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="flex min-h-[46px] items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-white transition hover:bg-gray-900 sm:col-span-2 lg:col-span-1"
+          >
+            <img src={assets.searchIcon} alt="searchicon" className="h-5 w-5" />
+            <span>Search</span>
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

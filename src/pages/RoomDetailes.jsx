@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import {
-  assets,
-  facilityIcons,
-  roomCommonData,
-  roomsDummyData,
-} from "../assets/assets";
+import { useNavigate, useParams } from "react-router-dom";
+import { assets, roomCommonData } from "../assets/assets";
 import StarRating from "../components/StarRating";
 import API_BASE_URL from "../config/api";
 
@@ -45,7 +40,7 @@ const RoomDetailes = () => {
     };
 
     try {
-      const response = fetch(
+      fetch(
         `${API_BASE_URL}/api/availability/check-availability/${id}`,
         {
           method: "POST",
@@ -133,7 +128,7 @@ const RoomDetailes = () => {
   }
 
   return (
-    <div className="py-20 md:py-28 lg:py-32 px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32">
+    <div className="px-4 py-24 sm:px-6 md:px-12 lg:px-20 xl:px-32">
       {/* Room Details */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-playfair font-bold leading-tight">
@@ -177,7 +172,7 @@ const RoomDetailes = () => {
 
         {/* Side Images */}
         <div className="w-full lg:w-1/2 grid grid-cols-2 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 h-64 sm:h-80 md:h-96 lg:h-[420px]">
-          {room.images.slice(0, 4).map((image, index) => (
+          {(room.images || []).slice(0, 4).map((image, index) => (
             <img
               key={index}
               src={image}
@@ -201,7 +196,7 @@ const RoomDetailes = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4 sm:mt-6 mb-6">
-            {Object.keys(room.amenities)
+            {Object.keys(room.amenities || {})
               .filter((item) => room.amenities[item])
               .map((item, index) => (
                 <div
@@ -215,7 +210,7 @@ const RoomDetailes = () => {
         </div>
 
         <div className="flex flex-col items-start sm:items-end gap-4">
-          <p className="text-2xl sm:text-3xl md:text-4xl font-semibold whitespace-nowrap">
+          <p className="text-2xl font-semibold sm:text-3xl md:text-4xl">
             ${room.price}/night
           </p>
 
@@ -398,7 +393,7 @@ const RoomDetailes = () => {
       {/* Host */}
       <div className="flex flex-col items-start gap-3 sm:gap-4 mt-12 sm:mt-16 lg:mt-20 pb-10">
         <p className="text-base sm:text-lg md:text-xl font-semibold">
-          {`Hosted by ${room.owner.fullName}`}
+          {`Hosted by ${room.owner?.fullName || "our partner"}`}
         </p>
         <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 sm:px-6 py-2 sm:py-2.5 rounded transition-all cursor-pointer text-sm sm:text-base font-medium">
           Contact Now

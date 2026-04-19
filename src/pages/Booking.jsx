@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { assets } from "../assets/assets";
 import API_BASE_URL from "../config/api";
 
 const Booking = () => {
@@ -125,7 +124,7 @@ const Booking = () => {
     nights > 0 ? nights * room.price * parseInt(formData.guests) : 0;
 
   return (
-    <div className="py-20 md:py-28 lg:py-32 px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32">
+    <div className="px-4 py-24 sm:px-6 md:px-12 lg:px-20 xl:px-32">
       <h1 className="text-3xl sm:text-4xl font-playfair font-bold mb-8">
         Booking Details
       </h1>
@@ -176,7 +175,7 @@ const Booking = () => {
 
         {/* Booking Form */}
         <div className="flex-1">
-          <div className="bg-white shadow-lg rounded-xl p-6 sticky top-20">
+          <div className="rounded-xl bg-white p-6 shadow-lg lg:sticky lg:top-24">
             <h2 className="text-2xl font-playfair font-bold mb-6">
               Complete Your Booking
             </h2>

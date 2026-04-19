@@ -10,8 +10,7 @@ const Sidebar = () => {
   ];
   return (
     <div
-      className=" md:w-64 w-16 border-r h-full text-base border-gray-300 pt-4
-    flex flex-col transition-all duration-300"
+      className="flex w-full gap-2 overflow-x-auto border-b border-gray-300 bg-white p-3 text-base transition-all duration-300 lg:w-64 lg:flex-col lg:border-b-0 lg:border-r lg:pt-4"
     >
       {sidebarLinks.map((item, index) => (
         <NavLink
@@ -19,15 +18,15 @@ const Sidebar = () => {
           key={index}
           end="/owner"
           className={({ isActive }) =>
-            `flex item-center py-3 px-4 md:px-8 gap-3 ${
+            `flex min-w-fit items-center gap-3 rounded-lg px-4 py-3 lg:rounded-none lg:px-8 ${
               isActive
-                ? "border-r-4 md:border-r-[6px] bg-blue-600/10 border-blue-600 text-blue-600 "
-                : "hover:bg-gray-100/90 border-white text-gray-700"
+                ? "bg-blue-600/10 text-blue-600 lg:border-r-4 lg:border-blue-600"
+                : "text-gray-700 hover:bg-gray-100/90"
             }`
           }
         >
           <img src={item.icon} alt="item.name" className="min-h-6 min-w-6" />
-          <p className="md:block hidden text-center">{item.name}</p>
+          <p className="block text-center">{item.name}</p>
         </NavLink>
       ))}
     </div>

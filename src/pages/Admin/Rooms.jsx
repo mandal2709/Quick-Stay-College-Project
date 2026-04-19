@@ -34,7 +34,7 @@ const Rooms = () => {
       />
 
       <div>
-        <div className="w-full max-w-4xl text-left border border-gray-300 rounded-lg overflow-x-auto">
+        <div className="w-full max-w-4xl overflow-x-auto rounded-lg border border-gray-300 text-left">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>

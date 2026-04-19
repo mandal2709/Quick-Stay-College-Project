@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { assets, facilityIcons, roomsDummyData } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import StarRating from "../components/StarRating";
+import API_BASE_URL from "../config/api";
 
 const CheckBox = ({ label, selected = false, onChange = () => {} }) => {
   return (
@@ -42,7 +43,7 @@ const AllRooms = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/rooms");
+        const response = await fetch(`${API_BASE_URL}/api/rooms`);
         const data = await response.json();
         const approvedRooms = data.filter(
           (room) => room.approvalStatus === "approved",

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { assets } from "../assets/assets";
+import API_BASE_URL from "../config/api";
 
 const Booking = () => {
   const { id } = useParams();
@@ -17,7 +18,7 @@ const Booking = () => {
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/rooms/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/rooms/${id}`);
         const data = await response.json();
         setRoom(data);
         setLoading(false);
@@ -71,7 +72,7 @@ const Booking = () => {
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/bookings/create-booking/${id}`,
+        `${API_BASE_URL}/api/bookings/create-booking/${id}`,
         {
           method: "POST",
           headers: {

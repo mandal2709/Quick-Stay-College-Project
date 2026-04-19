@@ -2,12 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { assets } from "../../assets/assets";
+import API_BASE_URL from "../../config/api";
 
 const Navbar = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:5000/api/auth/logout",
+        `${API_BASE_URL}/api/auth/logout`,
         {},
         { withCredentials: true },
       );

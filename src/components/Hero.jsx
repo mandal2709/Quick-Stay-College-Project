@@ -2,6 +2,7 @@ import React from "react";
 import { assets } from "../assets/assets";
 import heroImage2 from "../assets/heroImage2.jpg";
 import { useState } from "react";
+import API_BASE_URL from "../config/api";
 
 const Hero = () => {
   const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ const Hero = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/availability/check-availability",
+        `${API_BASE_URL}/api/availability/check-availability`,
         {
           method: "POST",
           headers: {

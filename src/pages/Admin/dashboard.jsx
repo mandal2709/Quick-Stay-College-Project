@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Title from "../../components/Title";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -10,7 +11,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/stats", {
+        const res = await axios.get(`${API_BASE_URL}/api/admin/stats`, {
           withCredentials: true,
         });
         setStats(res.data);

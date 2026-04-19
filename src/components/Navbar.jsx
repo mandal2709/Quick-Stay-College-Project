@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { assets } from "../assets/assets";
+import API_BASE_URL from "../config/api";
 
 const BookIcon = () => (
   <svg
@@ -40,7 +41,7 @@ const Navbar = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
           withCredentials: true,
         });
         if (res.data.user) {
@@ -60,7 +61,7 @@ const Navbar = () => {
   const logout = async () => {
     try {
       await axios.post(
-        "http://localhost:5000/api/auth/logout",
+        `${API_BASE_URL}/api/auth/logout`,
         {},
         { withCredentials: true },
       );

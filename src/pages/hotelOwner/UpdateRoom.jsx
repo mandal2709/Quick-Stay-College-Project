@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Title from "../../components/Title";
 import { assets } from "../../assets/assets";
+import API_BASE_URL from "../../config/api";
 
 const UpdateRoom = () => {
   const { id } = useParams();
@@ -42,7 +43,7 @@ const UpdateRoom = () => {
       try {
         setLoading(true);
         setError("");
-        const response = await fetch(`http://localhost:5000/api/rooms/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/rooms/${id}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -132,7 +133,7 @@ const UpdateRoom = () => {
       });
 
       // Make request to backend
-      const response = await fetch(`http://localhost:5000/api/rooms/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/rooms/${id}`, {
         method: "PUT",
         body: formData,
         credentials: "include",

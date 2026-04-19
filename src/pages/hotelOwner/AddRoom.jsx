@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Title from "../../components/Title";
 import { assets } from "../../assets/assets";
+import API_BASE_URL from "../../config/api";
 
 const AddRoom = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -77,7 +78,7 @@ const AddRoom = () => {
       // Make request to backend with multipart/form-data
       // FormData automatically sets Content-Type: multipart/form-data
       // The httpOnly cookie will be sent automatically with credentials: "include"
-      const response = await fetch("http://localhost:5000/api/rooms", {
+      const response = await fetch(`${API_BASE_URL}/api/rooms`, {
         method: "POST",
         contentType: "multipart/form-data",
         body: formData,

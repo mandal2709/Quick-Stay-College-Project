@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { roomsDummyData, assets } from "../../assets/assets";
 import Title from "../../components/Title";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../config/api";
 
 const ListRoom = () => {
   const [rooms, setRooms] = useState([]);
@@ -14,12 +15,9 @@ const ListRoom = () => {
       try {
         setLoading(true);
         setError("");
-        const response = await fetch(
-          "http://localhost:5000/api/rooms/my-rooms",
-          {
-            credentials: "include",
-          },
-        );
+        const response = await fetch(`${API_BASE_URL}/api/rooms/my-rooms`, {
+          credentials: "include",
+        });
         const data = await response.json();
 
         if (!response.ok) {

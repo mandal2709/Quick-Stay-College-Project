@@ -3,6 +3,7 @@ import Title from "../../components/Title";
 import { assets, dashboardDummyData } from "../../assets/assets";
 import { useState } from "react";
 import { useEffect } from "react";
+import API_BASE_URL from "../../config/api";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -15,7 +16,7 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/bookings/owner-bookings",
+          `${API_BASE_URL}/api/bookings/owner-bookings`,
           {
             credentials: "include",
           },

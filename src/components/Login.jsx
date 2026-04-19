@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,13 +28,9 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData,
-        {
-          withCredentials: true, // Send cookies automatically
-        },
-      );
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, formData, {
+        withCredentials: true, // Send cookies automatically
+      });
 
       // Store token in localStorage for client-side auth checks
       // The httpOnly cookie is sent automatically by the browser

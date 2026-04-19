@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Title from "../components/Title";
 import { assets } from "../assets/assets";
+import API_BASE_URL from "../config/api";
 
 const MyBooking = () => {
   const [bookings, setBookings] = useState([]);
@@ -19,7 +20,7 @@ const MyBooking = () => {
 
       try {
         const response = await fetch(
-          "http://localhost:5000/api/bookings/user-bookings",
+          `${API_BASE_URL}/api/bookings/user-bookings`,
           {
             credentials: "include",
           },
@@ -53,7 +54,7 @@ const MyBooking = () => {
     try {
       setCancelling(bookingId);
       const response = await fetch(
-        `http://localhost:5000/api/bookings/cancel-booking/${bookingId}`,
+        `${API_BASE_URL}/api/bookings/cancel-booking/${bookingId}`,
         {
           method: "PUT",
           credentials: "include",

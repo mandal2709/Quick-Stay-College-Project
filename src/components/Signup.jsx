@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const Signup = () => {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        `${API_BASE_URL}/api/auth/signup`,
         formData,
         {
           withCredentials: true, // Send cookies automatically
@@ -74,7 +75,13 @@ const Signup = () => {
             required
           />
 
-          <select name="role" id="role" className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-black" onChange={handleChange} required>
+          <select
+            name="role"
+            id="role"
+            className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            onChange={handleChange}
+            required
+          >
             <option value="">Select Role</option>
             <option value="user">User</option>
             <option value="owner">Owner</option>

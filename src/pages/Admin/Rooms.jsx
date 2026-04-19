@@ -3,6 +3,7 @@ import Title from "../../components/Title";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../config/api";
 
 const Rooms = () => {
   const [rooms, setRooms] = useState([]);
@@ -11,7 +12,7 @@ const Rooms = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/rooms");
+        const response = await fetch(`${API_BASE_URL}/api/rooms`);
         const data = await response.json();
         setRooms(data);
         console.log("Fetched rooms:", data);

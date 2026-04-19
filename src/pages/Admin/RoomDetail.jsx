@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Title from "../../components/Title";
+import API_BASE_URL from "../../config/api";
 
 const RoomDetail = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const RoomDetail = () => {
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/rooms/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/rooms/${id}`);
         const data = await response.json();
         setRoom(data);
         setLoading(false);
@@ -27,12 +28,12 @@ const RoomDetail = () => {
   const handleApprove = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/admin/approve-room/${id}`,
+        `${API_BASE_URL}/api/admin/approve-room/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            },
+          },
           credentials: "include", // Include cookies for authentication
         },
       );
@@ -52,7 +53,7 @@ const RoomDetail = () => {
   const handleReject = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/admin/reject-room/${id}`,
+        `${API_BASE_URL}/api/admin/reject-room/${id}`,
         {
           method: "PUT",
           headers: {

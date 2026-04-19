@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Title from "../../components/Title";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -10,7 +11,7 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/users", {
+        const res = await axios.get(`${API_BASE_URL}/api/admin/users`, {
           withCredentials: true,
         });
         setUsers(res.data.users || []);

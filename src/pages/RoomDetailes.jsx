@@ -7,6 +7,7 @@ import {
   roomsDummyData,
 } from "../assets/assets";
 import StarRating from "../components/StarRating";
+import API_BASE_URL from "../config/api";
 
 const RoomDetailes = () => {
   const { id } = useParams();
@@ -45,7 +46,7 @@ const RoomDetailes = () => {
 
     try {
       const response = fetch(
-        `http://localhost:5000/api/availability/check-availability/${id}`,
+        `${API_BASE_URL}/api/availability/check-availability/${id}`,
         {
           method: "POST",
           headers: {
@@ -76,17 +77,14 @@ const RoomDetailes = () => {
 
     setReviewSubmitting(true);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/rooms/${id}/reviews`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(newReview),
+      const response = await fetch(`${API_BASE_URL}/api/rooms/${id}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        credentials: "include",
+        body: JSON.stringify(newReview),
+      });
 
       const data = await response.json();
       if (response.ok) {
@@ -107,7 +105,7 @@ const RoomDetailes = () => {
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/rooms/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/rooms/${id}`);
         const data = await response.json();
         setRoom(data);
         setMainImage(

@@ -6,6 +6,7 @@ import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
+import API_BASE_URL from "../config/api";
 
 const FeatureDestination = () => {
   const [rooms, setRooms] = useState([]);
@@ -15,7 +16,7 @@ const FeatureDestination = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/rooms");
+        const response = await fetch(`${API_BASE_URL}/api/rooms`);
         const data = await response.json();
         setRooms(data);
         console.log("Fetched rooms:", data);

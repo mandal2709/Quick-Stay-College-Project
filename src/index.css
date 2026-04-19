@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
+
+@import "tailwindcss";
+
+:root{
+  --color-primary:#2563EB;
+  --color-secondary:#FBBF24;
+}
+
+
+
+*{
+  font-family: Outfit;
+}
+
+.font-playfair{
+  font-family: Playfair !important;
+
+}
+
+/* Reset and layout helpers to ensure the app fills the viewport and the
+   footer stays pinned to the bottom when content is short. This targets
+   the root and its immediate children (ClerkProvider/BrowserRouter wrapper). */
+html, body, #root, #root > * {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Make the root a column flex container and let its children grow */
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+#root > * {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Footer must not grow so it remains at the bottom of the column */
+footer {
+  flex-shrink: 0;
+}
+
+/* Utility: hide scrollbars while keeping scroll behavior */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

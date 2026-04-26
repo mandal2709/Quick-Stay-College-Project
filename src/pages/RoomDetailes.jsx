@@ -40,16 +40,13 @@ const RoomDetailes = () => {
     };
 
     try {
-      fetch(
-        `${API_BASE_URL}/api/availability/check-availability/${id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(checkAvailabilityData),
+      fetch(`${API_BASE_URL}/api/availability/check-availability/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(checkAvailabilityData),
+      });
     } catch (error) {
       console.error("Error checking availability:", error);
       alert("An error occurred while checking availability. Please try again.");
@@ -127,6 +124,11 @@ const RoomDetailes = () => {
     );
   }
 
+  const getNextDay = (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
+    return next.toISOString().split("T")[0];
+  };
   return (
     <div className="px-4 py-24 sm:px-6 md:px-12 lg:px-20 xl:px-32">
       {/* Room Details */}
@@ -242,6 +244,8 @@ const RoomDetailes = () => {
               name="checkIn"
               id="checkIn"
               onChange={handleChange}
+              value={formData.checkIn}
+              min={new Date().toISOString().split("T")[0]}
               className="rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-blue-500 text-sm w-full"
               required
             />
@@ -258,6 +262,12 @@ const RoomDetailes = () => {
               id="checkOut"
               name="checkOut"
               onChange={handleChange}
+              value={formData.checkOut}
+              min={
+                formData.checkIn
+                  ? getNextDay(formData.checkIn) // ✅ always +1 day
+                  : getNextDay(new Date()) // default = tomorrow
+              }
               className="rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-blue-500 text-sm w-full"
               required
             />

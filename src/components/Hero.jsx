@@ -47,6 +47,12 @@ const Hero = () => {
     }
   };
 
+  const getNextDay = (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
+    return next.toISOString().split("T")[0];
+  };
+
   return (
     <div
       className="flex min-h-screen flex-col items-start justify-center bg-cover bg-center bg-no-repeat px-4 pb-12 pt-28 text-white sm:px-6 md:px-12 lg:px-20 xl:px-32"
@@ -95,6 +101,7 @@ const Hero = () => {
             <input
               id="checkIn"
               name="checkIn"
+              min={new Date().toISOString().split("T")[0]}
               onChange={handleInputChange}
               value={formData.checkIn}
               type="date"
@@ -110,6 +117,11 @@ const Hero = () => {
             <input
               id="checkOut"
               name="checkOut"
+              min={
+                formData.checkIn
+                  ? getNextDay(formData.checkIn)
+                  : getNextDay(new Date())
+              }
               onChange={handleInputChange}
               value={formData.checkOut}
               type="date"

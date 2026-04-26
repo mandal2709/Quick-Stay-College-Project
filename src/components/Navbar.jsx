@@ -24,7 +24,7 @@ const BookIcon = () => (
 const Navbar = () => {
   const navLinks = [
     { name: "Hotels", path: "/rooms" },
-    { name: "Experience", path: "/" },
+    // { name: "Experience", path: "/" },
     { name: "About", path: "/about" },
   ];
 
@@ -70,10 +70,6 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (location.pathname !== "/") {
-      return;
-    }
-
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -83,7 +79,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
 
-  const useDarkHeader = location.pathname !== "/" || isScrolled || isMenuOpen;
+  const useDarkHeader = isScrolled || isMenuOpen;
   const navTextClass = useDarkHeader ? "text-gray-900" : "text-white";
 
   return (
@@ -187,7 +183,7 @@ const Navbar = () => {
             onClick={() => setIsMenuOpen((prev) => !prev)}
             src={assets.menuIcon}
             alt="menu"
-            className={`h-4 cursor-pointer ${isScrolled ? "invert" : ""}`}
+            className={`h-4 cursor-pointer ${useDarkHeader ? "invert" : ""}`}
           />
         </div>
       </div>

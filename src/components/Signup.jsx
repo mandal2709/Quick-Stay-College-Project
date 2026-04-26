@@ -6,6 +6,9 @@ import API_BASE_URL from "../config/api";
 const Signup = () => {
   const navigate = useNavigate();
 
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,10 +20,17 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
+    const { name, value } = e.target; // ✅ extract first
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+    if (name === "password") {
+      const strength = calculateStrength(value); // ✅ use value directly
+      setPasswordStrength(strength);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -52,6 +62,29 @@ const Signup = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateStrength = (password) => {
+    let strength = 0;
+
+    if (password.length >= 6) strength++;
+    if (password.match(/[A-Z]/)) strength++;
+    if (password.match(/[0-9]/)) strength++;
+    if (password.match(/[@$!%*?&]/)) strength++;
+
+    return strength;
+  };
+
+  const getStrengthLabel = () => {
+    if (passwordStrength <= 1) return "Weak";
+    if (passwordStrength === 2) return "Medium";
+    if (passwordStrength >= 3) return "Strong";
+  };
+
+  const getStrengthColor = () => {
+    if (passwordStrength <= 1) return "bg-red-500";
+    if (passwordStrength === 2) return "bg-yellow-500";
+    return "bg-green-500";
   };
 
   return (
@@ -97,14 +130,46 @@ const Signup = () => {
             required
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            onChange={handleChange}
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              className="w-full border px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              onChange={handleChange}
+              required
+            />
+
+            {/* Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+
+          {/* Strength Bar */}
+          <div className="mt-2 h-2 w-full bg-gray-200 rounded">
+            <div
+              className={`h-2 rounded ${getStrengthColor()}`}
+              style={{ width: `${(passwordStrength / 4) * 100}%` }}
+            ></div>
+          </div>
+
+          {/* Strength Text */}
+          <p className="text-sm mt-1">
+            Strength: <span className="font-medium">{getStrengthLabel()}</span>
+          </p>
+
+          {/* Rules */}
+          <ul className="text-xs mt-2 text-gray-500 space-y-1">
+            <li>• At least 6 characters</li>
+            <li>• One uppercase letter</li>
+            <li>• One number</li>
+            <li>• One special character (@$!%*?&)</li>
+          </ul>
 
           <button
             type="submit"

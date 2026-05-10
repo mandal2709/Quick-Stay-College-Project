@@ -10,12 +10,32 @@ const Hero = () => {
     checkOut: "",
   });
 
+  const today = new Date().toISOString().split("T")[0];
+
+  const getNextDay = (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
+    return next.toISOString().split("T")[0];
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const updatedFormData = {
+        ...prev,
+        [name]: value,
+      };
+
+      if (
+        name === "checkIn" &&
+        updatedFormData.checkOut &&
+        updatedFormData.checkOut < getNextDay(value)
+      ) {
+        updatedFormData.checkOut = "";
+      }
+
+      return updatedFormData;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -45,12 +65,6 @@ const Hero = () => {
       console.error("Error checking availability:", error);
       alert("An error occurred while checking availability. Please try again.");
     }
-  };
-
-  const getNextDay = (date) => {
-    const next = new Date(date);
-    next.setDate(next.getDate() + 1);
-    return next.toISOString().split("T")[0];
   };
 
   return (
@@ -101,7 +115,7 @@ const Hero = () => {
             <input
               id="checkIn"
               name="checkIn"
-              min={new Date().toISOString().split("T")[0]}
+              min={today}
               onChange={handleInputChange}
               value={formData.checkIn}
               type="date"
@@ -120,7 +134,7 @@ const Hero = () => {
               min={
                 formData.checkIn
                   ? getNextDay(formData.checkIn)
-                  : getNextDay(new Date())
+                  : getNextDay(today)
               }
               onChange={handleInputChange}
               value={formData.checkOut}

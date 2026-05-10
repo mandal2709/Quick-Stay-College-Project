@@ -13,6 +13,13 @@ const Booking = () => {
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const today = new Date().toISOString().split("T")[0];
+
+  const getNextDay = (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
+    return next.toISOString().split("T")[0];
+  };
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
@@ -32,10 +39,22 @@ const Booking = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const updatedFormData = {
+        ...prev,
+        [name]: value,
+      };
+
+      if (
+        name === "checkIn" &&
+        updatedFormData.checkOut &&
+        updatedFormData.checkOut < getNextDay(value)
+      ) {
+        updatedFormData.checkOut = "";
+      }
+
+      return updatedFormData;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -190,6 +209,7 @@ const Booking = () => {
                   type="date"
                   name="checkIn"
                   value={formData.checkIn}
+                  min={today}
                   onChange={handleInputChange}
                   className="w-full rounded border border-gray-300 px-4 py-2 outline-none focus:border-blue-500"
                   required
@@ -205,6 +225,11 @@ const Booking = () => {
                   type="date"
                   name="checkOut"
                   value={formData.checkOut}
+                  min={
+                    formData.checkIn
+                      ? getNextDay(formData.checkIn)
+                      : getNextDay(today)
+                  }
                   onChange={handleInputChange}
                   className="w-full rounded border border-gray-300 px-4 py-2 outline-none focus:border-blue-500"
                   required

@@ -16,13 +16,32 @@ const RoomDetailes = () => {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 1, comment: "" });
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const today = new Date().toISOString().split("T")[0];
+
+  const getNextDay = (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
+    return next.toISOString().split("T")[0];
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const updatedFormData = {
+        ...prev,
+        [name]: value,
+      };
+
+      if (
+        name === "checkIn" &&
+        updatedFormData.checkOut &&
+        updatedFormData.checkOut < getNextDay(value)
+      ) {
+        updatedFormData.checkOut = "";
+      }
+
+      return updatedFormData;
+    });
   };
 
   const handleSubmit = (e) => {
@@ -124,11 +143,6 @@ const RoomDetailes = () => {
     );
   }
 
-  const getNextDay = (date) => {
-    const next = new Date(date);
-    next.setDate(next.getDate() + 1);
-    return next.toISOString().split("T")[0];
-  };
   return (
     <div className="px-4 py-24 sm:px-6 md:px-12 lg:px-20 xl:px-32">
       {/* Room Details */}
@@ -245,7 +259,7 @@ const RoomDetailes = () => {
               id="checkIn"
               onChange={handleChange}
               value={formData.checkIn}
-              min={new Date().toISOString().split("T")[0]}
+              min={today}
               className="rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-blue-500 text-sm w-full"
               required
             />
@@ -266,7 +280,7 @@ const RoomDetailes = () => {
               min={
                 formData.checkIn
                   ? getNextDay(formData.checkIn) // ✅ always +1 day
-                  : getNextDay(new Date()) // default = tomorrow
+                  : getNextDay(today)
               }
               className="rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-blue-500 text-sm w-full"
               required

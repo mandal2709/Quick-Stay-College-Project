@@ -10,7 +10,7 @@ const HotelCard = ({ room, index }) => {
       className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white text-gray-600 shadow-[0_14px_40px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:shadow-[0_18px_48px_rgba(15,23,42,0.12)]"
     >
       <img
-        src={room.images[0]}
+        src={Array.isArray(room.images) ? room.images[0] : room.images}
         alt={room.title}
         className="h-56 w-full object-cover"
       />
@@ -35,7 +35,7 @@ const HotelCard = ({ room, index }) => {
 
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-sm">
-            <span className="text-xl text-gray-800">${room.price}</span> /night
+            <span className="text-xl text-gray-800">₹{room.price}</span> /night
           </p>
           <button className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-all hover:bg-gray-50">
             Book Now

@@ -102,7 +102,7 @@ const AdminDashboard = () => {
                     {booking.room?.roomType || "—"}
                   </td>
                   <td className="py-3 px-4 text-gray-700 border-t border-gray-300 text-center">
-                    ${booking.totalPrice?.toFixed(2) ?? "—"}
+                    ₹{booking.totalPrice?.toFixed(2) ?? "—"}
                   </td>
                   <td className="py-3 px-4 border-t border-gray-300 flex justify-center">
                     <span

@@ -47,7 +47,36 @@ const Users = () => {
         subTitle="View and manage registered users."
       />
 
-      <div className="w-full max-w-4xl overflow-x-auto rounded-lg border border-gray-300 text-left">
+      <div className="space-y-4 md:hidden">
+        {users.map((user) => (
+          <div
+            key={user._id}
+            className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-base font-semibold text-gray-900">
+                  {user.fullName}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">{user.email}</p>
+              </div>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                {user.role}
+              </span>
+            </div>
+            <div className="mt-3 flex flex-col gap-2 text-sm text-gray-600">
+              <div>
+                <span className="font-medium text-gray-800">Joined:</span>{" "}
+                {user.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString()
+                  : "-"}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden w-full max-w-4xl overflow-x-auto rounded-lg border border-gray-300 text-left md:block">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>

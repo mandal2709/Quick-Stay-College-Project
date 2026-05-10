@@ -8,6 +8,7 @@ const MyBooking = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(null);
+  const [active, setActive] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -148,7 +149,7 @@ const MyBooking = () => {
                     <img src={assets.guestsIcon} alt="guests-icon" />
                     <span>Guests: {booking.guests}</span>
                   </div>
-                  <p className="text-base">Total: ${booking.totalPrice}</p>
+                  <p className="text-base">Total: ₹{booking.totalPrice}</p>
                 </div>
               </div>
 
@@ -185,7 +186,10 @@ const MyBooking = () => {
                 {booking.status === "booked" && (
                   <button
                     onClick={() => handleCancelBooking(booking._id)}
-                    disabled={cancelling === booking._id}
+                    disabled={
+                      cancelling === booking._id ||
+                      new Date() >= new Date(booking.checkIn)
+                    }
                     className="mt-2 px-3 py-1.5 text-xs border border-red-500 text-red-600 rounded hover:bg-red-50 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     {cancelling === booking._id ? "Cancelling..." : "Cancel"}

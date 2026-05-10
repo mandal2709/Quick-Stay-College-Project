@@ -200,7 +200,7 @@ const AllRooms = () => {
               </div>
 
               <p className="text-xl font-medium text-gray-700">
-                ${room.price}/night
+                ₹{room.price}/night
               </p>
             </div>
           </div>
@@ -251,7 +251,7 @@ const AllRooms = () => {
               {priceRange.map((range) => (
                 <CheckBox
                   key={range}
-                  label={`$ ${range}`}
+                  label={`₹ ${range}`}
                   selected={selectedPriceRange === range}
                   onChange={handlePriceChange}
                 />

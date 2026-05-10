@@ -69,7 +69,7 @@ const Dashboard = () => {
           <div className="flex flex-col sm:ml-4 font-medium">
             <p className="text-blue-500 text-lg">Totle Revenue</p>
             <p className="text-neutral-400 text-base">
-              ${dashboardData.totalRevenue}
+              ₹{dashboardData.totalRevenue}
             </p>
           </div>
         </div>
@@ -111,7 +111,7 @@ const Dashboard = () => {
                   </td>
 
                   <td className="py-3 px-4 text-gray-700 border-t border-gray-300 text-center">
-                    ${item.totalPrice}
+                    ₹{item.totalPrice}
                   </td>
 
                   <td className="py-3 px-4 border-t border-gray-300 flex">

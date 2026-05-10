@@ -14,12 +14,22 @@ const FeatureDestination = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/rooms`);
+        const response = await fetch(
+          `${API_BASE_URL}/api/rooms/featured-rooms`,
+        );
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error("Error fetching rooms:", response.status, errorData);
+          setRooms([]);
+          return;
+        }
+
         const data = await response.json();
-        setRooms(data);
-        console.log("Fetched rooms:", data);
+        setRooms(Array.isArray(data) ? data : []);
+        console.log("Featured rooms:", data);
       } catch (error) {
         console.error("Error fetching rooms:", error);
+        setRooms([]);
       }
     };
 

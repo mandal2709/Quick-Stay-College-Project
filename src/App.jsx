@@ -21,6 +21,7 @@ import AdminRoomDetail from "./pages/Admin/RoomDetail";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import About from "./pages/About";
+import DiscountedOffers from "./pages/DiscountedOffers";
 
 const App = () => {
   const pathname = useLocation().pathname;
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route path="/rooms" element={<AllRooms />} />
           <Route path="/rooms/:id" element={<RoomDetailes />} />
+          <Route path="/offers" element={<DiscountedOffers />} />
           <Route path="/booking/:id" element={<Booking />} />
           <Route path="/my-booking" element={<MyBooking />} />
           <Route path="/login" element={<Login />} />

@@ -7,11 +7,11 @@ const Sidebar = () => {
     { name: "Dashboard", path: "/admin", icon: assets.dashboardIcon },
     { name: "Users", path: "/admin/users", icon: assets.listIcon },
     { name: "Rooms", path: "/admin/rooms", icon: assets.addIcon },
-    {
-      name: "Bookings",
-      path: "/admin/bookings",
-      icon: assets.totalBookingIcon,
-    },
+    // {
+    //   name: "Bookings",
+    //   path: "/admin/bookings",
+    //   icon: assets.totalBookingIcon,
+    // },
   ];
 
   return (

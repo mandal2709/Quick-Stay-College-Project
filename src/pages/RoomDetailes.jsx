@@ -213,7 +213,7 @@ const RoomDetailes = () => {
 
         <div className="flex flex-col items-start sm:items-end gap-4">
           <p className="text-2xl font-semibold sm:text-3xl md:text-4xl">
-            ${room.price}/night
+            ₹{room.price}/night
           </p>
 
           <button

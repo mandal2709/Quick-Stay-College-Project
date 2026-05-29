@@ -189,7 +189,9 @@ const ListRoom = () => {
                       {item.title}
                     </p>
                     <p className="mt-1 text-sm text-gray-500">
-                      {item.roomType}
+                      {item.categoryPrices?.simple || item.price
+                        ? "Room available in multiple categories"
+                        : "Pricing available"}
                     </p>
                   </div>
                   <button
@@ -201,10 +203,16 @@ const ListRoom = () => {
                 </div>
 
                 <div className="grid gap-2 text-sm text-gray-600">
-                  <p>
-                    <span className="font-medium text-gray-800">Price:</span> ₹
-                    {item.price}
-                  </p>
+                  <div>
+                    <p className="font-medium text-gray-800">
+                      Category Prices:
+                    </p>
+                    <p>Simple: ₹{item.categoryPrices?.simple ?? item.price}</p>
+                    <p>Luxury: ₹{item.categoryPrices?.luxury ?? item.price}</p>
+                    <p>
+                      Premium: ₹{item.categoryPrices?.premium ?? item.price}
+                    </p>
+                  </div>
                   <p>
                     <span className="font-medium text-gray-800">Discount:</span>{" "}
                     {item.discount > 0 ? `₹${item.discount}` : "No discount"}
@@ -304,7 +312,9 @@ const ListRoom = () => {
                   <td className="py-3 px-4 text-gray-700">{item.title}</td>
 
                   <td className="py-3 px-4 text-gray-700 max-sm:hidden">
-                    {item.roomType}
+                    {item.categoryPrices?.simple || item.price
+                      ? "Multi-category pricing"
+                      : "—"}
                   </td>
 
                   <td className="py-3 px-4 text-gray-700 max-md:hidden">

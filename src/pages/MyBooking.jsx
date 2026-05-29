@@ -137,8 +137,7 @@ const MyBooking = () => {
                   <p className="font-playfair text-2xl">
                     {booking.room.title}
                     <span className="font-inter text-sm">
-                      {" "}
-                      ({booking.room.roomType})
+                      {booking.room.categoryPrices ? " (Multi-category)" : ""}
                     </span>
                   </p>
                   <div className="flex items-center gap-1 text-sm text-gray-500">

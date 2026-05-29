@@ -134,7 +134,7 @@ const RoomDetail = () => {
               <strong>Contact:</strong> {room.contact}
             </p>
             <p className="text-gray-600 mb-2">
-              <strong>Room Type:</strong> {room.roomType}
+              <strong>Categories:</strong> Simple / Luxury / Premium
             </p>
             <p className="text-gray-600 mb-2">
               <strong>Owner:</strong> {room.owner?.fullName || "N/A"}

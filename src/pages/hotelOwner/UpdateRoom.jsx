@@ -17,10 +17,11 @@ const UpdateRoom = () => {
 
   const [inputs, setInputs] = useState({
     title: "",
-    roomType: "",
     location: "",
     mobileNo: "",
-    pricePerNight: 0,
+    simplePrice: 0,
+    luxuryPrice: 0,
+    premiumPrice: 0,
     description: "",
     amenities: {
       "free Wi-Fi": false,
@@ -66,10 +67,11 @@ const UpdateRoom = () => {
         // Set form inputs
         setInputs({
           title: data.title || "",
-          roomType: data.roomType || "",
           location: data.location || "",
           mobileNo: data.contact || "",
-          pricePerNight: data.price || 0,
+          simplePrice: data.categoryPrices?.simple ?? data.price ?? 0,
+          luxuryPrice: data.categoryPrices?.luxury ?? data.price ?? 0,
+          premiumPrice: data.categoryPrices?.premium ?? data.price ?? 0,
           description: data.description || "",
           amenities: amenitiesMap,
         });
@@ -101,7 +103,9 @@ const UpdateRoom = () => {
         !inputs.title ||
         !inputs.location ||
         !inputs.mobileNo ||
-        !inputs.pricePerNight ||
+        !inputs.simplePrice ||
+        !inputs.luxuryPrice ||
+        !inputs.premiumPrice ||
         !inputs.description
       ) {
         setError("Please fill in all required fields");
@@ -119,10 +123,11 @@ const UpdateRoom = () => {
       // Create FormData
       const formData = new FormData();
       formData.append("title", inputs.title);
-      formData.append("roomType", inputs.roomType);
       formData.append("location", inputs.location);
       formData.append("mobileNo", inputs.mobileNo);
-      formData.append("pricePerNight", inputs.pricePerNight);
+      formData.append("simplePrice", inputs.simplePrice);
+      formData.append("luxuryPrice", inputs.luxuryPrice);
+      formData.append("premiumPrice", inputs.premiumPrice);
       formData.append("description", inputs.description);
       formData.append("amenities", JSON.stringify(inputs.amenities));
       formData.append("existingImages", JSON.stringify(existingImages));
@@ -309,35 +314,45 @@ const UpdateRoom = () => {
         </div>
       )}
 
-      {/* Room Type and Price */}
-      <div className="w-full flex max-sm:flex-col sm:gap-4 mt-6">
-        <div className="flex-1 max-w-48">
-          <p className="text-gray-800 mb-2">Room Type</p>
-          <select
-            value={inputs.roomType}
-            onChange={(e) => setInputs({ ...inputs, roomType: e.target.value })}
-            className="border opacity-70 border-gray-300 rounded p-2 w-full"
-          >
-            <option value="">Select Room Type</option>
-            <option value="single">Single Bed</option>
-            <option value="double">Double Bed</option>
-            <option value="suite">Family Suite</option>
-            <option value="luxury">Luxury Room</option>
-          </select>
-        </div>
-        <div>
-          <p className="text-gray-800 mb-2">
-            Price <span className="text-xs">/night</span>
-          </p>
-          <input
-            type="number"
-            placeholder="0"
-            className="border border-gray-300 rounded p-2 w-24"
-            value={inputs.pricePerNight}
-            onChange={(e) =>
-              setInputs({ ...inputs, pricePerNight: e.target.value })
-            }
-          />
+      {/* Room Categories and Prices */}
+      <div className="w-full flex flex-col gap-4 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <p className="text-gray-800 mb-2">Simple Price</p>
+            <input
+              type="number"
+              placeholder="₹0"
+              className="border border-gray-300 rounded p-2 w-full"
+              value={inputs.simplePrice}
+              onChange={(e) =>
+                setInputs({ ...inputs, simplePrice: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <p className="text-gray-800 mb-2">Luxury Price</p>
+            <input
+              type="number"
+              placeholder="₹0"
+              className="border border-gray-300 rounded p-2 w-full"
+              value={inputs.luxuryPrice}
+              onChange={(e) =>
+                setInputs({ ...inputs, luxuryPrice: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <p className="text-gray-800 mb-2">Premium Price</p>
+            <input
+              type="number"
+              placeholder="₹0"
+              className="border border-gray-300 rounded p-2 w-full"
+              value={inputs.premiumPrice}
+              onChange={(e) =>
+                setInputs({ ...inputs, premiumPrice: e.target.value })
+              }
+            />
+          </div>
         </div>
       </div>
 

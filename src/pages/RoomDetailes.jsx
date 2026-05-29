@@ -149,10 +149,6 @@ const RoomDetailes = () => {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-playfair font-bold leading-tight">
           {room.title}
-          <span className="font-inter text-xs sm:text-sm ml-2">
-            {" "}
-            ({room.roomType})
-          </span>
         </h1>
         <p className="text-xs font-inter py-1 px-2.5 sm:py-1.5 sm:px-3 text-white bg-orange-500 rounded-full whitespace-nowrap">
           20% OFF
@@ -226,9 +222,19 @@ const RoomDetailes = () => {
         </div>
 
         <div className="flex flex-col items-start sm:items-end gap-4">
-          <p className="text-2xl font-semibold sm:text-3xl md:text-4xl">
-            ₹{room.price}/night
-          </p>
+          <div className="text-right">
+            <p className="text-xl text-gray-500">Starting from</p>
+            <p className="text-2xl font-semibold sm:text-3xl md:text-4xl">
+              ₹{room.categoryPrices?.simple ?? room.price}/night
+            </p>
+            {room.categoryPrices && (
+              <div className="mt-2 text-sm text-gray-600 space-y-1">
+                <p>Simple: ₹{room.categoryPrices.simple}</p>
+                <p>Luxury: ₹{room.categoryPrices.luxury}</p>
+                <p>Premium: ₹{room.categoryPrices.premium}</p>
+              </div>
+            )}
+          </div>
 
           <button
             onClick={onBookNow}

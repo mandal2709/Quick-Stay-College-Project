@@ -35,7 +35,6 @@ const AllRooms = () => {
   const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
   const [rooms, setRooms] = useState([]);
-  const [selectedRoomTypes, setSelectedRoomTypes] = useState([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState("");
   const [selectedSortOption, setSelectedSortOption] = useState("");
 
@@ -56,23 +55,6 @@ const AllRooms = () => {
     fetchRooms();
   }, []);
 
-  const roomTypeOptions = [
-    { label: "Single Bed", value: "single" },
-    { label: "Double Bed", value: "double" },
-    { label: "Luxury Room", value: "luxury" },
-    { label: "Family Suite", value: "suite" },
-  ];
-
-  const handleTypeChange = (checked, label) => {
-    const option = roomTypeOptions.find((item) => item.label === label);
-    const value = option ? option.value : label.toLowerCase();
-
-    setSelectedRoomTypes((prev) => {
-      if (checked) return [...prev, value];
-      return prev.filter((item) => item !== value);
-    });
-  };
-
   const handlePriceChange = (checked, label) => {
     if (checked) {
       setSelectedPriceRange(label.replace("$ ", ""));
@@ -82,7 +64,6 @@ const AllRooms = () => {
   };
 
   const clearAllFilters = () => {
-    setSelectedRoomTypes([]);
     setSelectedPriceRange("");
     setSelectedSortOption("");
   };
@@ -102,12 +83,6 @@ const AllRooms = () => {
 
   const roomsToRender = (() => {
     let filtered = [...rooms];
-
-    if (selectedRoomTypes.length) {
-      filtered = filtered.filter((room) =>
-        selectedRoomTypes.includes(String(room.roomType || "").toLowerCase()),
-      );
-    }
 
     if (selectedPriceRange) {
       const [min, max] = selectedPriceRange
@@ -199,9 +174,18 @@ const AllRooms = () => {
                   ))}
               </div>
 
-              <p className="text-xl font-medium text-gray-700">
-                ₹{room.price}/night
-              </p>
+              <div>
+                <p className="text-xl font-medium text-gray-700">
+                  ₹{room.categoryPrices?.simple ?? room.price}/night
+                </p>
+                {room.categoryPrices && (
+                  <div className="text-sm text-gray-500 mt-1 space-y-0.5">
+                    <p>Simple ₹{room.categoryPrices.simple}</p>
+                    <p>Luxury ₹{room.categoryPrices.luxury}</p>
+                    <p>Premium ₹{room.categoryPrices.premium}</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -237,14 +221,10 @@ const AllRooms = () => {
         >
           <div className="px-5 pb-5 pt-5">
             <p className="pb-2 font-medium text-gray-800">Popular Filters</p>
-            {roomTypeOptions.map((type) => (
-              <CheckBox
-                key={type.value}
-                label={type.label}
-                selected={selectedRoomTypes.includes(type.value)}
-                onChange={handleTypeChange}
-              />
-            ))}
+            <p className="text-sm text-gray-500">
+              Room type filtering is no longer available. Use price and sort
+              filters instead.
+            </p>
 
             <div className="pt-5">
               <p className="pb-2 font-medium text-gray-800">Price Range</p>

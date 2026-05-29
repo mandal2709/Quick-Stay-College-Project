@@ -35,7 +35,10 @@ const HotelCard = ({ room, index }) => {
 
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-sm">
-            <span className="text-xl text-gray-800">₹{room.price}</span> /night
+            <span className="text-xl text-gray-800">
+              ₹{room.categoryPrices?.simple ?? room.price}
+            </span>{" "}
+            /night
           </p>
           <button className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-all hover:bg-gray-50">
             Book Now

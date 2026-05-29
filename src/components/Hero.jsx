@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import heroImage2 from "../assets/heroImage2.jpg";
+import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 
 const Hero = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     location: "",
     checkIn: "",
@@ -47,24 +49,10 @@ const Hero = () => {
       return;
     }
 
-    const checkAvailabilityData = {
-      location: formData.location,
-      checkIn: formData.checkIn,
-      checkOut: formData.checkOut,
-    };
-
-    try {
-      await fetch(`${API_BASE_URL}/api/availability/check-availability`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(checkAvailabilityData),
-      });
-    } catch (error) {
-      console.error("Error checking availability:", error);
-      alert("An error occurred while checking availability. Please try again.");
-    }
+    // Navigate to search results with the search parameters
+    navigate(
+      `/search?location=${encodeURIComponent(formData.location)}&checkIn=${formData.checkIn}&checkOut=${formData.checkOut}`,
+    );
   };
 
   return (

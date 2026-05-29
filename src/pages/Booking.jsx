@@ -167,9 +167,6 @@ const Booking = () => {
             <p className="text-gray-600 mb-2">
               <strong>Location:</strong> {room.location}
             </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Room Type:</strong> {room.roomType}
-            </p>
             <p className="text-gray-600 mb-4">
               <strong>Price per night:</strong> ${room.price}
             </p>

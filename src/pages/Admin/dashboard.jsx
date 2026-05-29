@@ -99,7 +99,7 @@ const AdminDashboard = () => {
                     {booking.user?.fullName || "—"}
                   </td>
                   <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
-                    {booking.room?.roomType || "—"}
+                    {booking.room?.title || "—"}
                   </td>
                   <td className="py-3 px-4 text-gray-700 border-t border-gray-300 text-center">
                     ₹{booking.totalPrice?.toFixed(2) ?? "—"}

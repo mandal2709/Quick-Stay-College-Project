@@ -22,6 +22,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import About from "./pages/About";
 import DiscountedOffers from "./pages/DiscountedOffers";
+import SearchResults from "./pages/SearchResults";
 
 const App = () => {
   const pathname = useLocation().pathname;
@@ -35,6 +36,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/rooms" element={<AllRooms />} />
           <Route path="/rooms/:id" element={<RoomDetailes />} />
           <Route path="/offers" element={<DiscountedOffers />} />

@@ -165,14 +165,14 @@ const SearchResults = () => {
         .map((value) => Number(value.trim()));
 
       filtered = filtered.filter((room) => {
-        const price = Number(room.price);
+        const price = Number(room.categoryPrices?.simple || 0);
         return price >= min && price <= max;
       });
     }
 
     if (selectedSortOption.trim()) {
       if (selectedSortOption === "Price Low to High") {
-        filtered.sort((a, b) => Number(a.price) - Number(b.price));
+        filtered.sort((a, b) => Number(a.categoryPrices?.simple || 0) - Number(b.categoryPrices?.simple || 0));
       } else if (selectedSortOption === "Price High to Low") {
         filtered.sort((a, b) => Number(b.price) - Number(a.price));
       } else if (selectedSortOption === "Newest First") {
@@ -259,7 +259,7 @@ const SearchResults = () => {
                   <div className="mt-3 flex items-center justify-between">
                     <div>
                       <p className="text-xl font-bold text-blue-600">
-                        ${room.categoryPrices?.simple ?? room.price}
+                        ₹{room.categoryPrices?.simple || 0}
                         <span className="text-sm text-gray-600">/night</span>
                       </p>
                     </div>

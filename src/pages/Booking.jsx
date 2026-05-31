@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 
 const Booking = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get("category") || "simple";
   const navigate = useNavigate();
   const [room, setRoom] = useState(null);
   const [formData, setFormData] = useState({
@@ -76,7 +78,10 @@ const Booking = () => {
     const nights = Math.ceil(
       (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24),
     );
-    const totalPrice = nights * room.price * parseInt(formData.guests);
+
+    // Get category price
+    const categoryPrice = room.categoryPrices?.[category] || 0;
+    const totalPrice = nights * categoryPrice * parseInt(formData.guests);
 
     try {
       setSubmitting(true);
@@ -87,6 +92,8 @@ const Booking = () => {
         checkOut: formData.checkOut,
         guests: parseInt(formData.guests),
         totalPrice: totalPrice,
+        roomCategory: category,
+        pricePerNight: categoryPrice,
       };
 
       const response = await fetch(
@@ -139,8 +146,9 @@ const Booking = () => {
     formData.checkIn && formData.checkOut
       ? Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24))
       : 0;
+  const categoryPrice = room.categoryPrices?.[category] || 0;
   const totalPrice =
-    nights > 0 ? nights * room.price * parseInt(formData.guests) : 0;
+    nights > 0 ? nights * categoryPrice * parseInt(formData.guests) : 0;
 
   return (
     <div className="px-4 py-24 sm:px-6 md:px-12 lg:px-20 xl:px-32">
@@ -168,7 +176,11 @@ const Booking = () => {
               <strong>Location:</strong> {room.location}
             </p>
             <p className="text-gray-600 mb-4">
-              <strong>Price per night:</strong> ${room.price}
+              <strong>Room Category:</strong>{" "}
+              <span className="capitalize">{category}</span>
+            </p>
+            <p className="text-gray-600 mb-4">
+              <strong>Price per night:</strong> ₹{categoryPrice}
             </p>
 
             <div className="border-t pt-4">
@@ -255,15 +267,15 @@ const Booking = () => {
               <div className="bg-gray-50 p-4 rounded-lg mt-6 border border-gray-200">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">
-                    ${room.price} x {nights} night{nights !== 1 ? "s" : ""} x{" "}
+                    ₹{categoryPrice} x {nights} night{nights !== 1 ? "s" : ""} x{" "}
                     {formData.guests} guest
                     {parseInt(formData.guests) !== 1 ? "s" : ""}
                   </span>
-                  <span className="font-medium">${totalPrice}</span>
+                  <span className="font-medium">₹{totalPrice}</span>
                 </div>
                 <div className="border-t pt-2 flex justify-between text-lg font-bold">
                   <span>Total Price:</span>
-                  <span className="text-orange-500">${totalPrice}</span>
+                  <span className="text-orange-500">₹{totalPrice}</span>
                 </div>
               </div>
 

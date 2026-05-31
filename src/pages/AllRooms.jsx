@@ -90,16 +90,16 @@ const AllRooms = () => {
         .map((value) => Number(value.trim()));
 
       filtered = filtered.filter((room) => {
-        const price = Number(room.price);
+        const price = Number(room.categoryPrices?.simple || 0);
         return price >= min && price <= max;
       });
     }
 
     if (selectedSortOption.trim()) {
       if (selectedSortOption === "Price Low to High") {
-        filtered.sort((a, b) => Number(a.price) - Number(b.price));
+        filtered.sort((a, b) => Number(a.categoryPrices?.simple || 0) - Number(b.categoryPrices?.simple || 0));
       } else if (selectedSortOption === "Price High to Low") {
-        filtered.sort((a, b) => Number(b.price) - Number(a.price));
+        filtered.sort((a, b) => Number(b.categoryPrices?.simple || 0) - Number(a.categoryPrices?.simple || 0));
       } else if (selectedSortOption === "Newest First") {
         filtered.sort(
           (a, b) =>
@@ -153,7 +153,7 @@ const AllRooms = () => {
                 {room.title}
               </p>
               <div className="flex items-center">
-                <StarRating />
+                <StarRating rating={5} />
                 <p className="ml-2">200+ review</p>
               </div>
               <div className="mt-2 flex items-center gap-1 text-sm text-gray-500">
@@ -175,11 +175,11 @@ const AllRooms = () => {
               </div>
 
               <div>
-                <p className="text-xl font-medium text-gray-700">
+                {/* <p className="text-xl font-medium text-gray-700">
                   ₹{room.categoryPrices?.simple ?? room.price}/night
-                </p>
+                </p> */}
                 {room.categoryPrices && (
-                  <div className="text-sm text-gray-500 mt-1 space-y-0.5">
+                  <div className="text-md text-gray-700 mt-1 space-y-0.5">
                     <p>Simple ₹{room.categoryPrices.simple}</p>
                     <p>Luxury ₹{room.categoryPrices.luxury}</p>
                     <p>Premium ₹{room.categoryPrices.premium}</p>

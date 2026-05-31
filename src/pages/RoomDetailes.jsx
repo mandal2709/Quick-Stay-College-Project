@@ -44,6 +44,10 @@ const RoomDetailes = () => {
     });
   };
 
+  const MAIN_IMAGE_HEIGHT = "h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px]";
+
+  const THUMBNAIL_HEIGHT = "h-[120px] sm:h-[160px] md:h-[220px] lg:h-[265px]";
+
   const handleSubmit = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -131,8 +135,8 @@ const RoomDetailes = () => {
     fetchRoomDetails();
   }, [id]);
 
-  const onBookNow = () => {
-    navigate(`/booking/${id}`);
+  const onBookNow = (category) => {
+    navigate(`/booking/${id}?category=${category}`);
   };
 
   if (!room || Object.keys(room).length === 0) {
@@ -172,30 +176,37 @@ const RoomDetailes = () => {
       </div>
 
       {/* Images */}
-      <div className="flex flex-col lg:flex-row mt-6 sm:mt-8 lg:mt-10 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-8 sm:mt-10">
         {/* Main Image */}
-        <div className="w-full lg:w-1/2 h-64 sm:h-80 md:h-96 lg:h-[420px]">
+        <div
+          className={`lg:col-span-2 ${MAIN_IMAGE_HEIGHT} overflow-hidden rounded-xl shadow-lg`}
+        >
           <img
-            src={mainImage}
+            src={
+              mainImage ||
+              "https://images.unsplash.com/photo-1566073771259-6a8506099945"
+            }
             alt="Main Room"
-            className="w-full h-full rounded-lg sm:rounded-xl shadow-md sm:shadow-lg object-cover"
+            className="w-full h-full object-cover transition-all duration-300"
           />
         </div>
 
-        {/* Side Images */}
-        <div className="w-full lg:w-1/2 grid grid-cols-2 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 h-64 sm:h-80 md:h-96 lg:h-[420px]">
+        {/* Thumbnail Images */}
+        <div className="grid grid-cols-2 gap-4">
           {(room.images || []).slice(0, 4).map((image, index) => (
-            <img
+            <div
               key={index}
-              src={image}
-              alt={`Room View ${index + 1}`}
-              onClick={() => setMainImage(image)}
-              className={`w-full h-full rounded-lg sm:rounded-xl shadow-md object-cover cursor-pointer transition-all ${
-                mainImage === image
-                  ? "outline outline-2 outline-orange-500"
-                  : "hover:shadow-lg"
-              }`}
-            />
+              className={`${THUMBNAIL_HEIGHT} overflow-hidden rounded-xl shadow-md`}
+            >
+              <img
+                src={image}
+                alt={`Room View ${index + 1}`}
+                onClick={() => setMainImage(image)}
+                className={`w-full h-full object-cover cursor-pointer transition-all duration-300 hover:scale-105 ${
+                  mainImage === image ? "ring-4 ring-orange-500" : ""
+                }`}
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -219,31 +230,62 @@ const RoomDetailes = () => {
                 </div>
               ))}
           </div>
-        </div>
 
-        <div className="flex flex-col items-start sm:items-end gap-4">
-          <div className="text-right">
-            <p className="text-xl text-gray-500">Starting from</p>
-            <p className="text-2xl font-semibold sm:text-3xl md:text-4xl">
-              ₹{room.categoryPrices?.simple ?? room.price}/night
-            </p>
-            {room.categoryPrices && (
-              <div className="mt-2 text-sm text-gray-600 space-y-1">
-                <p>Simple: ₹{room.categoryPrices.simple}</p>
-                <p>Luxury: ₹{room.categoryPrices.luxury}</p>
-                <p>Premium: ₹{room.categoryPrices.premium}</p>
+          {/* Category Prices */}
+          {room.categoryPrices && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              {/* Simple */}
+              <div className="border border-gray-300 rounded-lg p-4 sm:p-5 bg-white">
+                <p className="text-sm text-gray-600 font-medium">Simple</p>
+                <p className="text-xl sm:text-2xl font-semibold text-gray-800 mt-2">
+                  ₹{room.categoryPrices.simple}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">/night</p>
+                <button
+                  onClick={() => onBookNow("simple")}
+                  className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all
+                  text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
+                >
+                  Book Now
+                </button>
               </div>
-            )}
-          </div>
 
-          <button
-            onClick={onBookNow}
-            className="bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all
-    text-white rounded-md px-6 sm:px-8 py-2.5 sm:py-3 cursor-pointer 
-    font-medium text-sm sm:text-base whitespace-nowrap"
-          >
-            Book Now
-          </button>
+              {/* Luxury */}
+              <div className="border-2 border-orange-500 rounded-lg p-4 sm:p-5 bg-orange-50 relative">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  Popular
+                </div>
+                <p className="text-sm text-gray-600 font-medium">Luxury</p>
+                <p className="text-xl sm:text-2xl font-semibold text-gray-800 mt-2">
+                  ₹{room.categoryPrices.luxury}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">/night</p>
+                <button
+                  onClick={() => onBookNow("luxury")}
+                  className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all
+                  text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
+                >
+                  Book Now
+                </button>
+              </div>
+
+              {/* Premium */}
+              <div className="border border-gray-300 rounded-lg p-4 sm:p-5 bg-white">
+                <p className="text-sm text-gray-600 font-medium">Premium</p>
+                <p className="text-xl sm:text-2xl font-semibold text-gray-800 mt-2">
+                  ₹{room.categoryPrices.premium}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">/night</p>
+                <button
+                  onClick={() => onBookNow("premium")}
+                  className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all
+                  text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
+                >
+                  Book Now
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

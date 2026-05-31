@@ -128,7 +128,7 @@ const RoomDetail = () => {
               <strong>Location:</strong> {room.location}
             </p>
             <p className="text-gray-600 mb-2">
-              <strong>Price per night:</strong> ${room.price}
+              <strong>Price per night:</strong> ₹{room.categoryPrices?.simple || 0}
             </p>
             <p className="text-gray-600 mb-2">
               <strong>Contact:</strong> {room.contact}

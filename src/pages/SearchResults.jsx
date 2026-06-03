@@ -36,7 +36,7 @@ const SearchResults = () => {
   const location = searchParams.get("location");
   const checkIn = searchParams.get("checkIn");
   const checkOut = searchParams.get("checkOut");
-
+  const guestCount = Number(searchParams.get("guests")) || 1;
   const [rooms, setRooms] = useState([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState("");
   const [selectedSortOption, setSelectedSortOption] = useState("");
@@ -58,6 +58,7 @@ const SearchResults = () => {
               location,
               checkIn,
               checkOut,
+              guests: guestCount,
             }),
           },
         );
@@ -123,7 +124,7 @@ const SearchResults = () => {
     if (location && checkIn && checkOut) {
       fetchAvailableRooms();
     }
-  }, [location, checkIn, checkOut]);
+  }, [location, checkIn, checkOut, guestCount]);
 
   const handlePriceChange = (checked, label) => {
     if (checked) {
@@ -165,6 +166,17 @@ const SearchResults = () => {
       });
     }
 
+    if (guestCount > 1) {
+      filtered = filtered.filter((room) =>
+        ["simple", "luxury", "premium"].some((category) => {
+          const capacity = Number(
+            room.categoryGuestLimits?.[category] ?? 1,
+          );
+          return capacity >= guestCount;
+        }),
+      );
+    }
+
     if (selectedSortOption.trim()) {
       if (selectedSortOption === "Price Low to High") {
         filtered.sort(
@@ -193,10 +205,12 @@ const SearchResults = () => {
     const offers = ["simple", "luxury", "premium"]
       .map((key) => {
         const originalPrice = categoryPrices[key] ?? room.price ?? 0;
+        const capacity = Number(room.categoryGuestLimits?.[key] ?? 1);
         return {
           label: key.charAt(0).toUpperCase() + key.slice(1),
           originalPrice,
           discount: categoryDiscounts[key] || 0,
+          capacity,
         };
       })
       .filter((offer) => offer.originalPrice > 0);
@@ -211,6 +225,7 @@ const SearchResults = () => {
         label: "Offer",
         originalPrice: room.price || 0,
         discount: 0,
+        capacity: 1,
       },
     );
   };
@@ -234,6 +249,9 @@ const SearchResults = () => {
             {" • "}
             Check-out:{" "}
             <span className="font-semibold text-black">{checkOut}</span>
+            {" • "}
+            Guests:{" "}
+            <span className="font-semibold text-black">{guestCount}</span>
           </p>
         </div>
 
@@ -259,7 +277,7 @@ const SearchResults = () => {
                 className="cursor-pointer overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl"
                 onClick={() =>
                   navigate(
-                    `/rooms/${room._id}?checkIn=${checkIn}&checkOut=${checkOut}`,
+                    `/rooms/${room._id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guestCount}`,
                   )
                 }
               >
@@ -311,6 +329,9 @@ const SearchResults = () => {
                               Save ₹{bestOffer.discount} ({bestOffer.label})
                             </p>
                           )}
+                          <p className="text-xs text-gray-500 mt-1">
+                            Up to {bestOffer.capacity} guest{bestOffer.capacity !== 1 ? "s" : ""}
+                          </p>
                         </div>
                       );
                     })()}

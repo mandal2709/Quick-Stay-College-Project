@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { assets, roomCommonData } from "../assets/assets";
 import StarRating from "../components/StarRating";
 import API_BASE_URL from "../config/api";
@@ -11,11 +11,14 @@ const RoomDetailes = () => {
   const [formData, setFormData] = useState({
     checkIn: "",
     checkOut: "",
+    guests: "1",
   });
 
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 1, comment: "" });
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [availabilityStatus, setAvailabilityStatus] = useState(null);
+  const [availabilityMessage, setAvailabilityMessage] = useState("");
   const today = new Date().toISOString().split("T")[0];
 
   const getNextDay = (date) => {
@@ -48,11 +51,11 @@ const RoomDetailes = () => {
 
   const THUMBNAIL_HEIGHT = "h-[120px] sm:h-[160px] md:h-[220px] lg:h-[265px]";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!formData.checkIn || !formData.checkOut) {
+    if (!formData.checkIn || !formData.checkOut || !formData.guests) {
       alert("Please fill in all fields");
       return;
     }
@@ -60,23 +63,39 @@ const RoomDetailes = () => {
     const checkAvailabilityData = {
       checkIn: formData.checkIn,
       checkOut: formData.checkOut,
+      guests: Number(formData.guests),
     };
 
     try {
-      fetch(`${API_BASE_URL}/api/availability/check-availability/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${API_BASE_URL}/api/availability/check-availability/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(checkAvailabilityData),
         },
-        body: JSON.stringify(checkAvailabilityData),
-      });
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setAvailabilityStatus("available");
+        setAvailabilityMessage(data.message || "Room is available for selected dates.");
+      } else {
+        setAvailabilityStatus("unavailable");
+        setAvailabilityMessage(data.message || "Room is not available for the selected dates.");
+      }
     } catch (error) {
       console.error("Error checking availability:", error);
-      alert("An error occurred while checking availability. Please try again.");
+      setAvailabilityStatus("unavailable");
+      setAvailabilityMessage("An error occurred while checking availability. Please try again.");
     }
   };
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleNewReviewChange = (e) => {
     const { name, value } = e.target;
@@ -135,8 +154,38 @@ const RoomDetailes = () => {
     fetchRoomDetails();
   }, [id]);
 
+  useEffect(() => {
+    const queryCheckIn = searchParams.get("checkIn");
+    const queryCheckOut = searchParams.get("checkOut");
+    const queryGuests = searchParams.get("guests");
+
+    setFormData((prev) => ({
+      ...prev,
+      checkIn: queryCheckIn || prev.checkIn,
+      checkOut: queryCheckOut || prev.checkOut,
+      guests:
+        queryGuests && Number.isFinite(Number(queryGuests))
+          ? queryGuests
+          : prev.guests,
+    }));
+  }, [searchParams]);
+
+  const getBookingQuery = (category) => {
+    const params = new URLSearchParams();
+    params.set("category", category);
+    const queryCheckIn = formData.checkIn || searchParams.get("checkIn");
+    const queryCheckOut = formData.checkOut || searchParams.get("checkOut");
+    const queryGuests = formData.guests || searchParams.get("guests");
+
+    if (queryCheckIn) params.set("checkIn", queryCheckIn);
+    if (queryCheckOut) params.set("checkOut", queryCheckOut);
+    if (queryGuests) params.set("guests", queryGuests);
+
+    return params.toString();
+  };
+
   const onBookNow = (category) => {
-    navigate(`/booking/${id}?category=${category}`);
+    navigate(`/booking/${id}?${getBookingQuery(category)}`);
   };
 
   const categoryPrices = room.categoryPrices || {};
@@ -145,10 +194,12 @@ const RoomDetailes = () => {
   const getCategoryInfo = (key) => {
     const originalPrice = categoryPrices[key] ?? 0;
     const discount = categoryDiscounts[key] > 0 ? categoryDiscounts[key] : 0;
+    const guestLimit = Number(room.categoryGuestLimits?.[key] ?? 1);
     return {
       label: key.charAt(0).toUpperCase() + key.slice(1),
       originalPrice,
       discount,
+      guestLimit,
       discountedPrice:
         discount > 0 ? Math.max(originalPrice - discount, 0) : originalPrice,
       hasDiscount: discount > 0,
@@ -261,6 +312,18 @@ const RoomDetailes = () => {
               ))}
           </div>
 
+          {availabilityMessage && (
+            <div
+              className={`rounded-xl px-4 py-3 mb-6 text-sm font-medium ${
+                availabilityStatus === "available"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {availabilityMessage}
+            </div>
+          )}
+
           {/* Category Prices */}
           {room.categoryPrices && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -299,12 +362,22 @@ const RoomDetailes = () => {
                       Save ₹{info.discount}
                     </p>
                   )}
+                  <p className="text-xs text-gray-500 mt-1">
+                    Up to {info.guestLimit} guest{info.guestLimit !== 1 ? "s" : ""}
+                  </p>
                   <button
                     onClick={() => onBookNow(info.label.toLowerCase())}
+                    disabled={
+                      Number(formData.guests || searchParams.get("guests") || 1) >
+                      info.guestLimit
+                    }
                     className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all
-                    text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
+                    text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Book Now
+                    {Number(formData.guests || searchParams.get("guests") || 1) >
+                    info.guestLimit
+                      ? "Too many guests"
+                      : "Book Now"}
                   </button>
                 </div>
               ))}
@@ -354,6 +427,22 @@ const RoomDetailes = () => {
                   ? getNextDay(formData.checkIn) // ✅ always +1 day
                   : getNextDay(today)
               }
+              className="rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-blue-500 text-sm w-full"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col w-full sm:w-auto">
+            <label className="font-medium text-sm md:text-base text-gray-700">
+              Guests
+            </label>
+            <input
+              type="number"
+              id="guests"
+              name="guests"
+              min="1"
+              value={formData.guests}
+              onChange={handleChange}
               className="rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-blue-500 text-sm w-full"
               required
             />

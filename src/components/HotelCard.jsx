@@ -14,6 +14,7 @@ const HotelCard = ({ room, index }) => {
           label: key.charAt(0).toUpperCase() + key.slice(1),
           originalPrice,
           discount: categoryDiscounts[key] || 0,
+          capacity: Number(room.categoryGuestLimits?.[key] ?? 1),
         };
       })
       .filter((offer) => offer.originalPrice > 0);
@@ -30,7 +31,12 @@ const HotelCard = ({ room, index }) => {
       const bestValue = best.originalPrice - best.discount;
       const currentValue = current.originalPrice - current.discount;
       return currentValue < bestValue ? current : best;
-    }, offers[0]);
+    }, offers[0] || {
+      label: "Offer",
+      originalPrice: room.price || 0,
+      discount: 0,
+      capacity: 1,
+    });
   };
 
   const bestOffer = getBestOffer();
@@ -89,6 +95,9 @@ const HotelCard = ({ room, index }) => {
                 Save ₹{bestOffer.discount} ({bestOffer.label})
               </p>
             )}
+            <p className="text-xs text-gray-500 mt-1">
+              Up to {bestOffer.capacity} guest{bestOffer.capacity !== 1 ? "s" : ""}
+            </p>
           </div>
           <button className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-all hover:bg-gray-50">
             Book Now

@@ -10,6 +10,7 @@ const Hero = () => {
     location: "",
     checkIn: "",
     checkOut: "",
+    guests: "1",
   });
 
   const today = new Date().toISOString().split("T")[0];
@@ -44,14 +45,14 @@ const Hero = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!formData.checkIn || !formData.checkOut || !formData.location) {
+    if (!formData.checkIn || !formData.checkOut || !formData.location || !formData.guests) {
       alert("Please fill in all fields");
       return;
     }
 
     // Navigate to search results with the search parameters
     navigate(
-      `/search?location=${encodeURIComponent(formData.location)}&checkIn=${formData.checkIn}&checkOut=${formData.checkOut}`,
+      `/search?location=${encodeURIComponent(formData.location)}&checkIn=${formData.checkIn}&checkOut=${formData.checkOut}&guests=${formData.guests}`,
     );
   };
 
@@ -128,6 +129,23 @@ const Hero = () => {
               value={formData.checkOut}
               type="date"
               className="mt-1.5 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-black">
+              <img src={assets.calenderIcon} alt="" className="h-4" />
+              <label htmlFor="guests">Guests</label>
+            </div>
+            <input
+              id="guests"
+              name="guests"
+              type="number"
+              min="1"
+              value={formData.guests}
+              onChange={handleInputChange}
+              className="mt-1.5 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-500"
+              placeholder="1"
             />
           </div>
 

@@ -14,6 +14,12 @@ const Booking = () => {
     guests: "1",
   });
 
+  const selectedCategoryCapacity = Number(
+    room?.categoryGuestLimits?.[category] ?? 1,
+  );
+  const guestsCount = Number(formData.guests) || 1;
+  const isGuestCountValid = guestsCount > 0 && guestsCount <= selectedCategoryCapacity;
+
   const getCategoryOffer = (room, category) => {
     const originalPrice = Number(room?.categoryPrices?.[category] || 0);
     const discount = Number(room?.categoryDiscounts?.[category] || 0);
@@ -51,6 +57,22 @@ const Booking = () => {
     fetchRoomDetails();
   }, [id]);
 
+  useEffect(() => {
+    const queryCheckIn = searchParams.get("checkIn");
+    const queryCheckOut = searchParams.get("checkOut");
+    const queryGuests = searchParams.get("guests");
+
+    setFormData((prev) => ({
+      ...prev,
+      checkIn: queryCheckIn || prev.checkIn,
+      checkOut: queryCheckOut || prev.checkOut,
+      guests:
+        queryGuests && Number.isFinite(Number(queryGuests))
+          ? queryGuests
+          : prev.guests,
+    }));
+  }, [searchParams]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
@@ -76,6 +98,15 @@ const Booking = () => {
 
     if (!formData.checkIn || !formData.checkOut || !formData.guests) {
       alert("Please fill in all fields");
+      return;
+    }
+
+    if (!isGuestCountValid) {
+      alert(
+        `Selected category allows up to ${selectedCategoryCapacity} guest${
+          selectedCategoryCapacity !== 1 ? "s" : ""
+        }. Please reduce the number of guests or choose a different category.`,
+      );
       return;
     }
 
@@ -308,10 +339,15 @@ const Booking = () => {
                 </div>
               </div>
 
+              {(!isGuestCountValid || guestsCount <= 0) && (
+                <p className="text-sm text-red-600">
+                  The selected category supports up to {selectedCategoryCapacity} guest{selectedCategoryCapacity !== 1 ? "s" : ""}.
+                </p>
+              )}
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !isGuestCountValid}
                 className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all text-white rounded-md px-6 py-3 cursor-pointer font-medium text-base mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? "Creating Booking..." : "Confirm Booking"}
@@ -320,7 +356,11 @@ const Booking = () => {
               {/* Cancel Button */}
               <button
                 type="button"
-                onClick={() => navigate(`/rooms/${id}`)}
+                onClick={() =>
+                  navigate(
+                    `/rooms/${id}?checkIn=${encodeURIComponent(formData.checkIn)}&checkOut=${encodeURIComponent(formData.checkOut)}&guests=${encodeURIComponent(formData.guests)}`,
+                  )
+                }
                 className="w-full bg-gray-300 hover:bg-gray-400 transition-all text-gray-800 rounded-md px-6 py-2 cursor-pointer font-medium text-base"
               >
                 Cancel

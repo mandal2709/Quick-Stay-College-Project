@@ -14,6 +14,9 @@ const AddRoom = () => {
     simplePrice: 0,
     luxuryPrice: 0,
     premiumPrice: 0,
+    simpleGuestLimit: 1,
+    luxuryGuestLimit: 1,
+    premiumGuestLimit: 1,
     description: "",
     amenities: {
       "free Wi-Fi": false,
@@ -49,6 +52,9 @@ const AddRoom = () => {
         !inputs.simplePrice ||
         !inputs.luxuryPrice ||
         !inputs.premiumPrice ||
+        !inputs.simpleGuestLimit ||
+        !inputs.luxuryGuestLimit ||
+        !inputs.premiumGuestLimit ||
         !inputs.description
       ) {
         setError("Please fill in all required fields");
@@ -71,6 +77,9 @@ const AddRoom = () => {
       formData.append("simplePrice", inputs.simplePrice);
       formData.append("luxuryPrice", inputs.luxuryPrice);
       formData.append("premiumPrice", inputs.premiumPrice);
+      formData.append("simpleGuestLimit", inputs.simpleGuestLimit);
+      formData.append("luxuryGuestLimit", inputs.luxuryGuestLimit);
+      formData.append("premiumGuestLimit", inputs.premiumGuestLimit);
       formData.append("description", inputs.description);
       formData.append("amenities", JSON.stringify(inputs.amenities));
 
@@ -110,6 +119,9 @@ const AddRoom = () => {
         simplePrice: 0,
         luxuryPrice: 0,
         premiumPrice: 0,
+        simpleGuestLimit: 1,
+        luxuryGuestLimit: 1,
+        premiumGuestLimit: 1,
         description: "",
         amenities: {
           "free Wi-Fi": false,
@@ -288,6 +300,47 @@ const AddRoom = () => {
               value={inputs.premiumPrice}
               onChange={(e) =>
                 setInputs({ ...inputs, premiumPrice: e.target.value })
+              }
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <p className="text-gray-800 mb-2">Simple Guest Limit</p>
+            <input
+              type="number"
+              placeholder="1"
+              min="1"
+              className="border border-gray-300 rounded p-2 w-full"
+              value={inputs.simpleGuestLimit}
+              onChange={(e) =>
+                setInputs({ ...inputs, simpleGuestLimit: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <p className="text-gray-800 mb-2">Luxury Guest Limit</p>
+            <input
+              type="number"
+              placeholder="1"
+              min="1"
+              className="border border-gray-300 rounded p-2 w-full"
+              value={inputs.luxuryGuestLimit}
+              onChange={(e) =>
+                setInputs({ ...inputs, luxuryGuestLimit: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <p className="text-gray-800 mb-2">Premium Guest Limit</p>
+            <input
+              type="number"
+              placeholder="1"
+              min="1"
+              className="border border-gray-300 rounded p-2 w-full"
+              value={inputs.premiumGuestLimit}
+              onChange={(e) =>
+                setInputs({ ...inputs, premiumGuestLimit: e.target.value })
               }
             />
           </div>

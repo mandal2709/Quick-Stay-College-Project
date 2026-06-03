@@ -13,6 +13,18 @@ const Booking = () => {
     checkOut: "",
     guests: "1",
   });
+
+  const getCategoryOffer = (room, category) => {
+    const originalPrice = Number(room?.categoryPrices?.[category] || 0);
+    const discount = Number(room?.categoryDiscounts?.[category] || 0);
+    const discountedPrice = Math.max(originalPrice - discount, 0);
+
+    return {
+      originalPrice,
+      discount,
+      discountedPrice,
+    };
+  };
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const today = new Date().toISOString().split("T")[0];
@@ -79,9 +91,9 @@ const Booking = () => {
       (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24),
     );
 
-    // Get category price
-    const categoryPrice = room.categoryPrices?.[category] || 0;
-    const totalPrice = nights * categoryPrice * parseInt(formData.guests);
+    const categoryOffer = getCategoryOffer(room, category);
+    const pricePerNight = categoryOffer.discountedPrice;
+    const totalPrice = nights * pricePerNight * parseInt(formData.guests);
 
     try {
       setSubmitting(true);
@@ -93,7 +105,8 @@ const Booking = () => {
         guests: parseInt(formData.guests),
         totalPrice: totalPrice,
         roomCategory: category,
-        pricePerNight: categoryPrice,
+        pricePerNight: pricePerNight,
+        categoryDiscount: categoryOffer.discount,
       };
 
       const response = await fetch(
@@ -146,9 +159,10 @@ const Booking = () => {
     formData.checkIn && formData.checkOut
       ? Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24))
       : 0;
-  const categoryPrice = room.categoryPrices?.[category] || 0;
+  const categoryOffer = getCategoryOffer(room, category);
+  const pricePerNight = categoryOffer.discountedPrice;
   const totalPrice =
-    nights > 0 ? nights * categoryPrice * parseInt(formData.guests) : 0;
+    nights > 0 ? nights * pricePerNight * parseInt(formData.guests) : 0;
 
   return (
     <div className="px-4 py-24 sm:px-6 md:px-12 lg:px-20 xl:px-32">
@@ -180,8 +194,23 @@ const Booking = () => {
               <span className="capitalize">{category}</span>
             </p>
             <p className="text-gray-600 mb-4">
-              <strong>Price per night:</strong> ₹{categoryPrice}
+              <strong>Price per night:</strong>{" "}
+              {categoryOffer.discount > 0 ? (
+                <>
+                  <span className="line-through text-gray-400 mr-2">
+                    ₹{categoryOffer.originalPrice}
+                  </span>
+                  <span className="text-gray-900">₹{pricePerNight}</span>
+                </>
+              ) : (
+                `₹${pricePerNight}`
+              )}
             </p>
+            {categoryOffer.discount > 0 && (
+              <p className="text-sm text-red-600 mb-4">
+                Save ₹{categoryOffer.discount} per night
+              </p>
+            )}
 
             <div className="border-t pt-4">
               <h3 className="font-semibold mb-3">Amenities:</h3>
@@ -267,7 +296,7 @@ const Booking = () => {
               <div className="bg-gray-50 p-4 rounded-lg mt-6 border border-gray-200">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">
-                    ₹{categoryPrice} x {nights} night{nights !== 1 ? "s" : ""} x{" "}
+                    ₹{pricePerNight} x {nights} night{nights !== 1 ? "s" : ""} x{" "}
                     {formData.guests} guest
                     {parseInt(formData.guests) !== 1 ? "s" : ""}
                   </span>

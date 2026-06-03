@@ -17,6 +17,7 @@ const FeatureDestination = () => {
         const response = await fetch(
           `${API_BASE_URL}/api/rooms/featured-rooms`,
         );
+        console.log("Fetching featured rooms:", response);
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           console.error("Error fetching rooms:", response.status, errorData);

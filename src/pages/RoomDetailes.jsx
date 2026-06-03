@@ -139,6 +139,34 @@ const RoomDetailes = () => {
     navigate(`/booking/${id}?category=${category}`);
   };
 
+  const categoryPrices = room.categoryPrices || {};
+  const categoryDiscounts = room.categoryDiscounts || {};
+
+  const getCategoryInfo = (key) => {
+    const originalPrice = categoryPrices[key] ?? 0;
+    const discount = categoryDiscounts[key] > 0 ? categoryDiscounts[key] : 0;
+    return {
+      label: key.charAt(0).toUpperCase() + key.slice(1),
+      originalPrice,
+      discount,
+      discountedPrice:
+        discount > 0 ? Math.max(originalPrice - discount, 0) : originalPrice,
+      hasDiscount: discount > 0,
+    };
+  };
+
+  const categoryInfo = ["simple", "luxury", "premium"].map(getCategoryInfo);
+  const bestDiscountOffer = categoryInfo.reduce((best, current) => {
+    if (!best || current.discountedPrice < best.discountedPrice) {
+      return current;
+    }
+    return best;
+  }, categoryInfo[0]);
+  const bestDiscountLabel =
+    bestDiscountOffer?.hasDiscount && bestDiscountOffer.discount > 0
+      ? `${bestDiscountOffer.label} — Save ₹${bestDiscountOffer.discount}`
+      : null;
+
   if (!room || Object.keys(room).length === 0) {
     return (
       <div className="py-20 md:py-28 px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32 flex items-center justify-center min-h-screen">
@@ -154,9 +182,11 @@ const RoomDetailes = () => {
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-playfair font-bold leading-tight">
           {room.title}
         </h1>
-        <p className="text-xs font-inter py-1 px-2.5 sm:py-1.5 sm:px-3 text-white bg-orange-500 rounded-full whitespace-nowrap">
-          20% OFF
-        </p>
+        {bestDiscountLabel && (
+          <p className="text-xs font-inter py-1 px-2.5 sm:py-1.5 sm:px-3 text-white bg-orange-500 rounded-full whitespace-nowrap">
+            {bestDiscountLabel}
+          </p>
+        )}
       </div>
 
       {/* Rating */}
@@ -234,56 +264,50 @@ const RoomDetailes = () => {
           {/* Category Prices */}
           {room.categoryPrices && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              {/* Simple */}
-              <div className="border border-gray-300 rounded-lg p-4 sm:p-5 bg-white">
-                <p className="text-sm text-gray-600 font-medium">Simple</p>
-                <p className="text-xl sm:text-2xl font-semibold text-gray-800 mt-2">
-                  ₹{room.categoryPrices.simple}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">/night</p>
-                <button
-                  onClick={() => onBookNow("simple")}
-                  className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all
-                  text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
+              {categoryInfo.map((info) => (
+                <div
+                  key={info.label}
+                  className={`relative border rounded-lg p-4 sm:p-5 bg-white ${
+                    info.label === "Luxury"
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-gray-300"
+                  }`}
                 >
-                  Book Now
-                </button>
-              </div>
-
-              {/* Luxury */}
-              <div className="border-2 border-orange-500 rounded-lg p-4 sm:p-5 bg-orange-50 relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  Popular
+                  {info.label === "Luxury" && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      Popular
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-600 font-medium">
+                    {info.label}
+                  </p>
+                  <p className="text-xl sm:text-2xl font-semibold text-gray-800 mt-2">
+                    {info.hasDiscount ? (
+                      <>
+                        <span className="line-through text-gray-400 mr-2">
+                          ₹{info.originalPrice}
+                        </span>
+                        ₹{info.discountedPrice}
+                      </>
+                    ) : (
+                      `₹${info.originalPrice}`
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">/night</p>
+                  {info.hasDiscount && (
+                    <p className="text-xs text-red-600 mt-1">
+                      Save ₹{info.discount}
+                    </p>
+                  )}
+                  <button
+                    onClick={() => onBookNow(info.label.toLowerCase())}
+                    className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all
+                    text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
+                  >
+                    Book Now
+                  </button>
                 </div>
-                <p className="text-sm text-gray-600 font-medium">Luxury</p>
-                <p className="text-xl sm:text-2xl font-semibold text-gray-800 mt-2">
-                  ₹{room.categoryPrices.luxury}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">/night</p>
-                <button
-                  onClick={() => onBookNow("luxury")}
-                  className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all
-                  text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
-                >
-                  Book Now
-                </button>
-              </div>
-
-              {/* Premium */}
-              <div className="border border-gray-300 rounded-lg p-4 sm:p-5 bg-white">
-                <p className="text-sm text-gray-600 font-medium">Premium</p>
-                <p className="text-xl sm:text-2xl font-semibold text-gray-800 mt-2">
-                  ₹{room.categoryPrices.premium}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">/night</p>
-                <button
-                  onClick={() => onBookNow("premium")}
-                  className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all
-                  text-white rounded-md px-4 py-2 cursor-pointer font-medium text-sm mt-3"
-                >
-                  Book Now
-                </button>
-              </div>
+              ))}
             </div>
           )}
         </div>

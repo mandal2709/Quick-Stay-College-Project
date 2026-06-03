@@ -97,9 +97,17 @@ const AllRooms = () => {
 
     if (selectedSortOption.trim()) {
       if (selectedSortOption === "Price Low to High") {
-        filtered.sort((a, b) => Number(a.categoryPrices?.simple || 0) - Number(b.categoryPrices?.simple || 0));
+        filtered.sort(
+          (a, b) =>
+            Number(a.categoryPrices?.simple || 0) -
+            Number(b.categoryPrices?.simple || 0),
+        );
       } else if (selectedSortOption === "Price High to Low") {
-        filtered.sort((a, b) => Number(b.categoryPrices?.simple || 0) - Number(a.categoryPrices?.simple || 0));
+        filtered.sort(
+          (a, b) =>
+            Number(b.categoryPrices?.simple || 0) -
+            Number(a.categoryPrices?.simple || 0),
+        );
       } else if (selectedSortOption === "Newest First") {
         filtered.sort(
           (a, b) =>
@@ -111,6 +119,35 @@ const AllRooms = () => {
 
     return filtered;
   })();
+
+  const getBestOffer = (room) => {
+    const categoryDiscounts = room.categoryDiscounts || {};
+    const categoryPrices = room.categoryPrices || {};
+
+    const offers = ["simple", "luxury", "premium"]
+      .map((key) => {
+        const originalPrice = categoryPrices[key] ?? room.price ?? 0;
+        return {
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          originalPrice,
+          discount: categoryDiscounts[key] || 0,
+        };
+      })
+      .filter((offer) => offer.originalPrice > 0);
+
+    return offers.reduce(
+      (best, current) => {
+        const bestValue = best.originalPrice - best.discount;
+        const currentValue = current.originalPrice - current.discount;
+        return currentValue < bestValue ? current : best;
+      },
+      offers[0] || {
+        label: "Offer",
+        originalPrice: room.price || 0,
+        discount: 0,
+      },
+    );
+  };
 
   return (
     <div className="flex flex-col-reverse gap-8 px-4 pb-12 pt-24 sm:px-6 md:px-12 lg:flex-row lg:items-start lg:px-20 xl:px-32">
@@ -175,9 +212,6 @@ const AllRooms = () => {
               </div>
 
               <div>
-                {/* <p className="text-xl font-medium text-gray-700">
-                  ₹{room.categoryPrices?.simple ?? room.price}/night
-                </p> */}
                 {room.categoryPrices && (
                   <div className="text-md text-gray-700 mt-1 space-y-0.5">
                     <p>Simple ₹{room.categoryPrices.simple}</p>
@@ -185,6 +219,33 @@ const AllRooms = () => {
                     <p>Premium ₹{room.categoryPrices.premium}</p>
                   </div>
                 )}
+                {(() => {
+                  const bestOffer = getBestOffer(room);
+                  const discountedPrice =
+                    bestOffer.originalPrice - bestOffer.discount;
+                  return (
+                    <div className="mt-3">
+                      <p className="text-xl font-medium text-gray-700">
+                        {bestOffer.discount > 0 ? (
+                          <>
+                            <span className="line-through text-gray-400 mr-2">
+                              ₹{bestOffer.originalPrice}
+                            </span>
+                            ₹{discountedPrice}
+                          </>
+                        ) : (
+                          `₹${bestOffer.originalPrice}`
+                        )}
+                        <span className="text-sm text-gray-600">/night</span>
+                      </p>
+                      {bestOffer.discount > 0 && (
+                        <p className="text-sm text-red-600 mt-1">
+                          Save ₹{bestOffer.discount} ({bestOffer.label})
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>

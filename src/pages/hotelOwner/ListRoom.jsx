@@ -41,7 +41,13 @@ const ListRoom = () => {
     fetchRooms();
   }, []);
 
-  const handleDiscount = async (roomId) => {
+  const getDiscounts = (room) => ({
+    simple: room.categoryDiscounts?.simple ?? 0,
+    luxury: room.categoryDiscounts?.luxury ?? 0,
+    premium: room.categoryDiscounts?.premium ?? 0,
+  });
+
+  const handleDiscount = async (roomId, category) => {
     const price = parseFloat(discountPrice[roomId]);
     if (isNaN(price) || price < 0) {
       alert("Please enter a valid discount price");
@@ -49,7 +55,7 @@ const ListRoom = () => {
     }
 
     try {
-      setApplyingDiscount(roomId);
+      setApplyingDiscount(`${roomId}-${category}`);
       const response = await fetch(
         `${API_BASE_URL}/api/rooms/${roomId}/discount`,
         {
@@ -60,6 +66,7 @@ const ListRoom = () => {
           credentials: "include",
           body: JSON.stringify({
             discountPrice: price,
+            category,
           }),
         },
       );
@@ -71,14 +78,31 @@ const ListRoom = () => {
         return;
       }
 
-      // Update the room in state with new discount
       setRooms((prevRooms) =>
-        prevRooms.map((room) =>
-          room._id === roomId ? { ...room, discount: price } : room,
-        ),
+        prevRooms.map((room) => {
+          if (room._id !== roomId) return room;
+          const existingDiscounts = getDiscounts(room);
+          const updatedDiscounts = {
+            simple: existingDiscounts.simple,
+            luxury: existingDiscounts.luxury,
+            premium: existingDiscounts.premium,
+          };
+
+          if (category === "all") {
+            updatedDiscounts.simple = price;
+            updatedDiscounts.luxury = price;
+            updatedDiscounts.premium = price;
+          } else {
+            updatedDiscounts[category] = price;
+          }
+
+          return {
+            ...room,
+            categoryDiscounts: updatedDiscounts,
+          };
+        }),
       );
 
-      // Clear the discount input for this room
       setDiscountPrice((prev) => ({
         ...prev,
         [roomId]: "",
@@ -93,19 +117,25 @@ const ListRoom = () => {
     }
   };
 
-  const handleRemoveDiscount = async (roomId) => {
+  const handleRemoveDiscount = async (roomId, category = "all") => {
     const confirmRemove = window.confirm(
-      "Are you sure you want to remove the discount?",
+      `Are you sure you want to remove ${
+        category === "all" ? "all discounts" : `${category} discount`
+      }?`,
     );
     if (!confirmRemove) return;
 
     try {
-      setRemovingDiscount(roomId);
+      setRemovingDiscount(`${roomId}-${category}`);
       const response = await fetch(
         `${API_BASE_URL}/api/rooms/${roomId}/discount`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
           credentials: "include",
+          body: JSON.stringify({ category }),
         },
       );
 
@@ -116,11 +146,29 @@ const ListRoom = () => {
         return;
       }
 
-      // Update the room in state
       setRooms((prevRooms) =>
-        prevRooms.map((room) =>
-          room._id === roomId ? { ...room, discount: 0 } : room,
-        ),
+        prevRooms.map((room) => {
+          if (room._id !== roomId) return room;
+          const existingDiscounts = getDiscounts(room);
+          if (category === "all") {
+            return {
+              ...room,
+              categoryDiscounts: {
+                simple: 0,
+                luxury: 0,
+                premium: 0,
+              },
+            };
+          }
+
+          return {
+            ...room,
+            categoryDiscounts: {
+              ...existingDiscounts,
+              [category]: 0,
+            },
+          };
+        }),
       );
 
       alert("Discount Removed Successfully");
@@ -177,6 +225,12 @@ const ListRoom = () => {
                   .trim(),
             );
 
+          const categoryDiscounts = getDiscounts(item);
+          const hasAnyDiscount =
+            categoryDiscounts.simple > 0 ||
+            categoryDiscounts.luxury > 0 ||
+            categoryDiscounts.premium > 0;
+
           return (
             <div
               key={index}
@@ -213,10 +267,24 @@ const ListRoom = () => {
                       Premium: ₹{item.categoryPrices?.premium ?? item.price}
                     </p>
                   </div>
-                  <p>
-                    <span className="font-medium text-gray-800">Discount:</span>{" "}
-                    {item.discount > 0 ? `₹${item.discount}` : "No discount"}
-                  </p>
+                  <div>
+                    <p className="font-medium text-gray-800">Discounts:</p>
+                    {hasAnyDiscount ? (
+                      <div className="space-y-1 text-sm text-gray-700">
+                        {categoryDiscounts.simple > 0 && (
+                          <p>Simple: ₹{categoryDiscounts.simple}</p>
+                        )}
+                        {categoryDiscounts.luxury > 0 && (
+                          <p>Luxury: ₹{categoryDiscounts.luxury}</p>
+                        )}
+                        {categoryDiscounts.premium > 0 && (
+                          <p>Premium: ₹{categoryDiscounts.premium}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">No discount</span>
+                    )}
+                  </div>
                   {amenitiesList.length > 0 && (
                     <p>
                       <span className="font-medium text-gray-800">
@@ -230,7 +298,7 @@ const ListRoom = () => {
                 <div className="flex flex-col gap-2">
                   <input
                     type="number"
-                    placeholder={`Discount ₹${item.price}`}
+                    placeholder="Discount amount"
                     value={discountPrice[item._id] || ""}
                     onChange={(e) =>
                       setDiscountPrice({
@@ -240,25 +308,54 @@ const ListRoom = () => {
                     }
                     className="w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
-                  <div className="flex gap-2">
+                  <div className="grid gap-2 sm:grid-cols-2">
                     <button
-                      disabled={applyingDiscount === item._id}
-                      className="flex-1 rounded-xl bg-blue-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handleDiscount(item._id)}
+                      disabled={applyingDiscount === `${item._id}-all`}
+                      className="w-full rounded-xl bg-blue-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleDiscount(item._id, "all")}
                     >
-                      {applyingDiscount === item._id ? "Applying..." : "Apply"}
+                      {applyingDiscount === `${item._id}-all`
+                        ? "Applying..."
+                        : "Apply All"}
                     </button>
-                    {item.discount > 0 && (
-                      <button
-                        disabled={removingDiscount === item._id}
-                        className="flex-1 rounded-xl bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        onClick={() => handleRemoveDiscount(item._id)}
-                      >
-                        {removingDiscount === item._id
-                          ? "Removing..."
-                          : "Remove"}
-                      </button>
-                    )}
+                    <button
+                      disabled={applyingDiscount === `${item._id}-simple`}
+                      className="w-full rounded-xl bg-slate-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleDiscount(item._id, "simple")}
+                    >
+                      {applyingDiscount === `${item._id}-simple`
+                        ? "Applying..."
+                        : "Simple"}
+                    </button>
+                    <button
+                      disabled={applyingDiscount === `${item._id}-luxury`}
+                      className="w-full rounded-xl bg-slate-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleDiscount(item._id, "luxury")}
+                    >
+                      {applyingDiscount === `${item._id}-luxury`
+                        ? "Applying..."
+                        : "Luxury"}
+                    </button>
+                    <button
+                      disabled={applyingDiscount === `${item._id}-premium`}
+                      className="w-full rounded-xl bg-slate-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleDiscount(item._id, "premium")}
+                    >
+                      {applyingDiscount === `${item._id}-premium`
+                        ? "Applying..."
+                        : "Premium"}
+                    </button>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      disabled={removingDiscount === `${item._id}-all`}
+                      className="w-full rounded-xl bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleRemoveDiscount(item._id, "all")}
+                    >
+                      {removingDiscount === `${item._id}-all`
+                        ? "Removing..."
+                        : "Remove All"}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -304,6 +401,12 @@ const ListRoom = () => {
                       .trim(),
                 );
 
+              const categoryDiscounts = getDiscounts(item);
+              const hasAnyDiscount =
+                categoryDiscounts.simple > 0 ||
+                categoryDiscounts.luxury > 0 ||
+                categoryDiscounts.premium > 0;
+
               return (
                 <tr
                   key={index}
@@ -330,14 +433,23 @@ const ListRoom = () => {
                   </td>
 
                   <td className="py-3 px-4 text-gray-700 max-lg:hidden">
-                    {item.discount > 0 ? (
-                      <div className="text-sm">
-                        <p className="font-medium text-blue-600">
-                          Discount: ₹{item.discount}
-                        </p>
-                        <p className="text-green-600 font-semibold">
-                          Discounted: ₹{item.price - item.discount}
-                        </p>
+                    {hasAnyDiscount ? (
+                      <div className="text-sm space-y-1">
+                        {categoryDiscounts.simple > 0 && (
+                          <p className="font-medium text-blue-600">
+                            Simple: ₹{categoryDiscounts.simple}
+                          </p>
+                        )}
+                        {categoryDiscounts.luxury > 0 && (
+                          <p className="font-medium text-blue-600">
+                            Luxury: ₹{categoryDiscounts.luxury}
+                          </p>
+                        )}
+                        {categoryDiscounts.premium > 0 && (
+                          <p className="font-medium text-blue-600">
+                            Premium: ₹{categoryDiscounts.premium}
+                          </p>
+                        )}
                       </div>
                     ) : (
                       <span className="text-gray-400">No discount</span>
@@ -368,7 +480,7 @@ const ListRoom = () => {
                       <div className="flex flex-col gap-2">
                         <input
                           type="number"
-                          placeholder={`Discount ₹${item.price}`}
+                          placeholder="Discount amount"
                           value={discountPrice[item._id] || ""}
                           onChange={(e) =>
                             setDiscountPrice({
@@ -378,28 +490,55 @@ const ListRoom = () => {
                           }
                           className="px-3 py-2 rounded border border-gray-300 bg-gray-50 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
-                        <div className="flex gap-2">
+                        <div className="grid gap-2 sm:grid-cols-2">
                           <button
-                            disabled={applyingDiscount === item._id}
-                            className="flex-1 bg-blue-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={() => handleDiscount(item._id)}
+                            disabled={applyingDiscount === `${item._id}-all`}
+                            className="w-full bg-blue-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleDiscount(item._id, "all")}
                           >
-                            {applyingDiscount === item._id
+                            {applyingDiscount === `${item._id}-all`
                               ? "Applying..."
-                              : "Apply"}
+                              : "Apply All"}
                           </button>
-                          {item.discount > 0 && (
-                            <button
-                              disabled={removingDiscount === item._id}
-                              className="flex-1 bg-red-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                              onClick={() => handleRemoveDiscount(item._id)}
-                            >
-                              {removingDiscount === item._id
-                                ? "Removing..."
-                                : "Remove"}
-                            </button>
-                          )}
+                          <button
+                            disabled={applyingDiscount === `${item._id}-simple`}
+                            className="w-full bg-slate-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleDiscount(item._id, "simple")}
+                          >
+                            {applyingDiscount === `${item._id}-simple`
+                              ? "Applying..."
+                              : "Simple"}
+                          </button>
+                          <button
+                            disabled={applyingDiscount === `${item._id}-luxury`}
+                            className="w-full bg-slate-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleDiscount(item._id, "luxury")}
+                          >
+                            {applyingDiscount === `${item._id}-luxury`
+                              ? "Applying..."
+                              : "Luxury"}
+                          </button>
+                          <button
+                            disabled={
+                              applyingDiscount === `${item._id}-premium`
+                            }
+                            className="w-full bg-slate-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleDiscount(item._id, "premium")}
+                          >
+                            {applyingDiscount === `${item._id}-premium`
+                              ? "Applying..."
+                              : "Premium"}
+                          </button>
                         </div>
+                        <button
+                          disabled={removingDiscount === `${item._id}-all`}
+                          className="w-full rounded-xl bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => handleRemoveDiscount(item._id, "all")}
+                        >
+                          {removingDiscount === `${item._id}-all`
+                            ? "Removing..."
+                            : "Remove All"}
+                        </button>
                       </div>
                     </div>
                   </td>

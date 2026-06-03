@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { assets } from "../assets/assets";
 import StarRating from "../components/StarRating";
 import API_BASE_URL from "../config/api";
 
@@ -38,9 +37,7 @@ const SearchResults = () => {
   const checkIn = searchParams.get("checkIn");
   const checkOut = searchParams.get("checkOut");
 
-  const [openFilters, setOpenFilters] = useState(false);
   const [rooms, setRooms] = useState([]);
-  const [availableRooms, setAvailableRooms] = useState([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState("");
   const [selectedSortOption, setSelectedSortOption] = useState("");
   const [loading, setLoading] = useState(true);
@@ -115,11 +112,9 @@ const SearchResults = () => {
         );
 
         setRooms(filtered);
-        setAvailableRooms(filtered);
       } catch (error) {
         console.error("Error fetching available rooms:", error);
         setRooms([]);
-        setAvailableRooms([]);
       } finally {
         setLoading(false);
       }
@@ -172,7 +167,11 @@ const SearchResults = () => {
 
     if (selectedSortOption.trim()) {
       if (selectedSortOption === "Price Low to High") {
-        filtered.sort((a, b) => Number(a.categoryPrices?.simple || 0) - Number(b.categoryPrices?.simple || 0));
+        filtered.sort(
+          (a, b) =>
+            Number(a.categoryPrices?.simple || 0) -
+            Number(b.categoryPrices?.simple || 0),
+        );
       } else if (selectedSortOption === "Price High to Low") {
         filtered.sort((a, b) => Number(b.price) - Number(a.price));
       } else if (selectedSortOption === "Newest First") {
@@ -186,6 +185,35 @@ const SearchResults = () => {
 
     return filtered;
   })();
+
+  const getBestOffer = (room) => {
+    const categoryDiscounts = room.categoryDiscounts || {};
+    const categoryPrices = room.categoryPrices || {};
+
+    const offers = ["simple", "luxury", "premium"]
+      .map((key) => {
+        const originalPrice = categoryPrices[key] ?? room.price ?? 0;
+        return {
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          originalPrice,
+          discount: categoryDiscounts[key] || 0,
+        };
+      })
+      .filter((offer) => offer.originalPrice > 0);
+
+    return offers.reduce(
+      (best, current) => {
+        const bestValue = best.originalPrice - best.discount;
+        const currentValue = current.originalPrice - current.discount;
+        return currentValue < bestValue ? current : best;
+      },
+      offers[0] || {
+        label: "Offer",
+        originalPrice: room.price || 0,
+        discount: 0,
+      },
+    );
+  };
 
   return (
     <div className="flex flex-col-reverse gap-8 px-4 pb-12 pt-24 sm:px-6 md:px-12 lg:flex-row lg:items-start lg:px-20 xl:px-32">
@@ -224,11 +252,11 @@ const SearchResults = () => {
             </button>
           </div>
         ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-6 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1">
             {roomsToRender.map((room) => (
               <div
                 key={room._id}
-                className="cursor-pointer overflow-hidden rounded-lg border border-gray-200 shadow-md transition hover:shadow-lg"
+                className="cursor-pointer overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl"
                 onClick={() =>
                   navigate(
                     `/rooms/${room._id}?checkIn=${checkIn}&checkOut=${checkOut}`,
@@ -248,7 +276,7 @@ const SearchResults = () => {
                     </div>
                   )}
                 </div>
-                <div className="p-4">
+                <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-800">
                     {room.title}
                   </h3>
@@ -257,12 +285,35 @@ const SearchResults = () => {
                     {room.description}
                   </p>
                   <div className="mt-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-xl font-bold text-blue-600">
-                        ₹{room.categoryPrices?.simple || 0}
-                        <span className="text-sm text-gray-600">/night</span>
-                      </p>
-                    </div>
+                    {(() => {
+                      const bestOffer = getBestOffer(room);
+                      const discountedPrice =
+                        bestOffer.originalPrice - bestOffer.discount;
+                      return (
+                        <div>
+                          <p className="text-xl font-bold text-blue-600">
+                            {bestOffer.discount > 0 ? (
+                              <>
+                                <span className="line-through text-gray-400 mr-2">
+                                  ₹{bestOffer.originalPrice}
+                                </span>
+                                ₹{discountedPrice}
+                              </>
+                            ) : (
+                              `₹${bestOffer.originalPrice}`
+                            )}
+                            <span className="text-sm text-gray-600">
+                              /night
+                            </span>
+                          </p>
+                          {bestOffer.discount > 0 && (
+                            <p className="text-xs text-red-500 mt-1">
+                              Save ₹{bestOffer.discount} ({bestOffer.label})
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
                     <div className="flex items-center gap-1">
                       <StarRating rating={room.rating || 0} />
                     </div>

@@ -38,6 +38,35 @@ const ExclusiveOffers = () => {
     fetchOffers();
   }, []);
 
+  const getOfferSummary = (room) => {
+    const categoryDiscounts = room.categoryDiscounts || {};
+    const categoryPrices = room.categoryPrices || {};
+
+    const prices = ["simple", "luxury", "premium"]
+      .map((key) => {
+        const originalPrice = categoryPrices[key] ?? room.price ?? 0;
+        return {
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          originalPrice,
+          discount: categoryDiscounts[key] || 0,
+        };
+      })
+      .filter((offer) => offer.originalPrice > 0);
+
+    return prices.reduce(
+      (best, current) => {
+        const bestPrice = best.originalPrice - best.discount;
+        const currentPrice = current.originalPrice - current.discount;
+        return currentPrice < bestPrice ? current : best;
+      },
+      prices[0] || {
+        label: "Offer",
+        originalPrice: room.price || 0,
+        discount: 0,
+      },
+    );
+  };
+
   return (
     <div className="flex flex-col items-center px-4 pb-20 pt-16 sm:px-6 md:px-12 lg:px-20 xl:px-32">
       <div className="flex w-full flex-col items-start justify-between gap-6 md:flex-row md:items-end">
@@ -69,42 +98,48 @@ const ExclusiveOffers = () => {
             No discounted offers available.
           </div>
         ) : (
-          offers.map((item) => (
-            <div
-              key={item._id}
-              className="group relative flex min-h-[260px] flex-col justify-end gap-2 rounded-2xl bg-cover bg-center bg-no-repeat px-5 pb-6 pt-16 text-white shadow-lg"
-              style={{ backgroundImage: `url(${item.images?.[0] || ""})` }}
-            >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
-              <p className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-800">
-                {item.discount}% OFF
-              </p>
+          offers.map((item) => {
+            const bestOffer = getOfferSummary(item);
+            const finalPrice = bestOffer.originalPrice - bestOffer.discount;
 
-              <div className="relative z-10">
-                <p className="text-2xl font-medium font-playfair">
-                  {item.title}
-                </p>
-                <p className="mt-2 text-sm text-white/85">
-                  {item.description || item.location}
-                </p>
-                <p className="mt-3 text-xs text-white/70">
-                  Now ₹{item.price - item.discount} (was ₹{item.price})
+            return (
+              <div
+                key={item._id}
+                className="group relative flex min-h-[260px] flex-col justify-end gap-2 rounded-2xl bg-cover bg-center bg-no-repeat px-5 pb-6 pt-16 text-white shadow-lg"
+                style={{ backgroundImage: `url(${item.images?.[0] || ""})` }}
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+                <p className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-800">
+                  Save ₹{bestOffer.discount}
                 </p>
 
-                <button
-                  onClick={() => navigate(`/rooms/${item._id}`)}
-                  className="mt-4 flex items-center gap-2 font-medium"
-                >
-                  View Offers
-                  <img
-                    className="invert transition-all group-hover:translate-x-1"
-                    src={assets.arrowIcon}
-                    alt="arrow icon"
-                  />
-                </button>
+                <div className="relative z-10">
+                  <p className="text-2xl font-medium font-playfair">
+                    {item.title}
+                  </p>
+                  <p className="mt-2 text-sm text-white/85">
+                    {item.description || item.location}
+                  </p>
+                  <p className="mt-3 text-xs text-white/70">
+                    Now ₹{finalPrice} (was ₹{bestOffer.originalPrice}) •{" "}
+                    {bestOffer.label}
+                  </p>
+
+                  <button
+                    onClick={() => navigate(`/rooms/${item._id}`)}
+                    className="mt-4 flex items-center gap-2 font-medium"
+                  >
+                    View Offers
+                    <img
+                      className="invert transition-all group-hover:translate-x-1"
+                      src={assets.arrowIcon}
+                      alt="arrow icon"
+                    />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

@@ -1,19 +1,25 @@
-import React from 'react'
-import { assets } from '../assets/assets'
+import React from "react";
+import { assets } from "../assets/assets";
 
-const StarRating = ({rating = 0}) => {
+const StarRating = ({ rating = 0 }) => {
+  const numericRating = Math.min(Math.max(Number(rating) || 0, 0), 5);
+
   return (
-    <>
-      {Array(5)
-          .fill('')
-          .map((_, index) => (
-            
-            <img src={rating > index ? assets.starIconFilled : assets.starIconOutlined} alt="star-icon"
-            className='w-4.5 h-4.5'/>
-            
-          ))}
-    </>
-  )
-}
+    <div className="flex items-center gap-1">
+      {Array.from({ length: 5 }, (_, index) => (
+        <img
+          key={index}
+          src={
+            numericRating > index
+              ? assets.starIconFilled
+              : assets.starIconOutlined
+          }
+          alt={numericRating > index ? "filled star" : "outlined star"}
+          className="w-5 h-5"
+        />
+      ))}
+    </div>
+  );
+};
 
-export default StarRating
+export default StarRating;

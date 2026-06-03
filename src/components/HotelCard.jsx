@@ -3,6 +3,40 @@ import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 
 const HotelCard = ({ room, index }) => {
+  const categoryPrices = room.categoryPrices || {};
+  const categoryDiscounts = room.categoryDiscounts || {};
+
+  const getBestOffer = () => {
+    const offers = ["simple", "luxury", "premium"]
+      .map((key) => {
+        const originalPrice = categoryPrices[key] ?? room.price ?? 0;
+        return {
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          originalPrice,
+          discount: categoryDiscounts[key] || 0,
+        };
+      })
+      .filter((offer) => offer.originalPrice > 0);
+
+    if (offers.length === 0) {
+      return {
+        label: "Offer",
+        originalPrice: room.price || 0,
+        discount: 0,
+      };
+    }
+
+    return offers.reduce((best, current) => {
+      const bestValue = best.originalPrice - best.discount;
+      const currentValue = current.originalPrice - current.discount;
+      return currentValue < bestValue ? current : best;
+    }, offers[0]);
+  };
+
+  const bestOffer = getBestOffer();
+  const isDiscounted = bestOffer.discount > 0;
+  const discountedPrice = bestOffer.originalPrice - bestOffer.discount;
+
   return (
     <Link
       to={`/rooms/${room._id}`}
@@ -34,12 +68,28 @@ const HotelCard = ({ room, index }) => {
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          <p className="text-sm">
-            <span className="text-xl text-gray-800">
-              ₹{room.categoryPrices?.simple || 0}
-            </span>{" "}
-            /night
-          </p>
+          <div>
+            <p className="text-sm">
+              <span className="text-xl text-gray-800">
+                {isDiscounted ? (
+                  <>
+                    <span className="line-through text-gray-400 mr-2">
+                      ₹{bestOffer.originalPrice}
+                    </span>
+                    ₹{discountedPrice}
+                  </>
+                ) : (
+                  `₹${bestOffer.originalPrice}`
+                )}
+              </span>{" "}
+              /night
+            </p>
+            {isDiscounted && (
+              <p className="text-xs text-red-600">
+                Save ₹{bestOffer.discount} ({bestOffer.label})
+              </p>
+            )}
+          </div>
           <button className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-all hover:bg-gray-50">
             Book Now
           </button>

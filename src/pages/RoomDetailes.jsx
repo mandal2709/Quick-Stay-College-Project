@@ -21,6 +21,20 @@ const RoomDetailes = () => {
   const [availabilityMessage, setAvailabilityMessage] = useState("");
   const today = new Date().toISOString().split("T")[0];
 
+  const handleContactClick = () => {
+    const email = "flurt2709@gmail.com";
+    const hotelName = room.title || "QuickStay Property";
+    const subject = encodeURIComponent(`Inquiry about ${hotelName}`);
+    const body = encodeURIComponent(
+      `Hi,\n\nI am interested in booking ${hotelName}. Could you please provide more details?\n\nThank you!`
+    );
+
+    window.open(
+      `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
+      "_blank"
+    );
+  };
+
   const getNextDay = (date) => {
     const next = new Date(date);
     next.setDate(next.getDate() + 1);
@@ -580,7 +594,9 @@ const RoomDetailes = () => {
         <p className="text-base sm:text-lg md:text-xl font-semibold">
           {`Hosted by ${room.owner?.fullName || "our partner"}`}
         </p>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 sm:px-6 py-2 sm:py-2.5 rounded transition-all cursor-pointer text-sm sm:text-base font-medium">
+        <button 
+          onClick={handleContactClick}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-5 sm:px-6 py-2 sm:py-2.5 rounded transition-all cursor-pointer text-sm sm:text-base font-medium">
           Contact Now
         </button>
       </div>
